@@ -1,13 +1,18 @@
 {
   "name": "job-research-analyst",
   "displayName": "求职调研分析",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "schemaVersion": "0.1.0",
-  "description": "求职信息调研与职业决策分析。根据目标国家/城市、平台、公司、岗位方向、学历、经验年限、行业偏好等，检索公开来源，整理岗位薪资、公司规模、扩张/收缩信号、员工工作体验，并产出公司深度介绍、岗位薪资与福利待遇对比、员工评价与风险提示。只产出可核实信息，不编造，不把单一个人言论当事实，不把招聘平台样本误写成全市场结论。触发：XX公司怎么样、XX岗位薪资多少、帮我调研几家目标公司、跳槽选哪家、公司深度调研、薪资福利对比、员工评价、求职调研、职业决策、帮我看看这几家公司、这个岗位值不值得去。Use when the user runs /job-research-analyst.",
+  "description": "求职信息调研与职业决策分析。凡对公司、岗位、JD、招聘信息的调研/查询/分析，或求职、跳槽、择业决策支持，必须使用本技能；不确定时默认使用、禁止跳过。检索公开来源，整理岗位薪资、公司规模、扩张/收缩信号、员工体验；默认产出公司深度介绍 Word、薪资福利对比 Excel、员工评价与风险 Excel。只产出可核实信息，不编造。典型句式仅提示、不构成边界：查一下这个公司、查下这家公司、看一下这个岗位jd、看下这个JD、看看这个JD、解读JD、分析JD、这个岗位怎么样、这家公司怎么样、值不值得去、值不值得进、帮我调研、调研这家公司、公司调研、跳槽选哪家、对比这几家、这几家怎么选、offer怎么选、薪资多少、工资待遇、年薪多少、福利待遇、员工评价、口碑怎么样、有没有坑、坑不坑、稳不稳定、会不会裁员、投不投、要不要面、面试前调研、入职风险、公司深度介绍、求职调研、职业决策。English triggers: check this company, look at this JD, job description, company research, job research, career decision, salary comparison, compensation and benefits, employee reviews, is this company worth joining, offer comparison, job hopping. Use when the user runs /job-research-analyst.",
   "license": "MIT",
   "entry": "SKILL.md",
   "referencesDir": "references",
   "versionHistory": [
+    {
+      "version": "0.2.0",
+      "date": "2026-09-06",
+      "summary": "触发强制化与命中词加厚；默认三件套硬闸；焦点领动样例综合进 Word 骨架；简历问询；校验脚本。需求来源：2026-09-06 升级需求文档（中电信无人科技调研事故）与焦点领动样例。"
+    },
     {
       "version": "0.1.0",
       "date": "2026-09-04",
