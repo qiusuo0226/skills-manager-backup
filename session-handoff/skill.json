@@ -1,0 +1,17 @@
+{
+  "name": "session-handoff",
+  "displayName": "会话交接",
+  "version": "0.1.0",
+  "schemaVersion": "0.1.0",
+  "description": "把当前对话里的需求、资料、进度和约束收成一份记忆 markdown，方便下一场会话接着干。落盘前询问保存位置；未指定时先识别操作系统再建议路径（例如 Windows 下的 Downloads）。触发：帮我记录一下上下文、帮我记住下面的话、会话交接、生成记忆 md。",
+  "license": "MIT",
+  "entry": "SKILL.md",
+  "referencesDir": "references",
+  "versionHistory": [
+    {
+      "version": "0.1.0",
+      "date": "2026-09-04",
+      "summary": "初始化开发仓，并写入会话交接初版规则。"
+    }
+  ]
+}

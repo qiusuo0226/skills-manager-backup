@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "skill_id": "d14a1de3-db0b-4e72-b8ea-318863a5696f",
+  "path": "chrono-pm-portfolio",
+  "path_key": "chrono-pm-portfolio",
+  "enabled": true,
+  "tags": [],
+  "source": {
+    "type": "local",
+    "ref": null,
+    "subpath": null,
+    "branch": null
+  }
+}

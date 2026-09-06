@@ -1,0 +1,75 @@
+{
+  "name": "skill-devkit",
+  "displayName": "Skill 开发工具包",
+  "version": "0.8.0",
+  "schemaVersion": "0.1.0",
+  "description": "空仓一次初始化，或收编已有无规范技能：版本控制、冻结基线、升级记录、变更门禁、触发词、一键打包、发布审计。问完即落盘，本包退场。不是业务项目管理。",
+  "license": "MIT",
+  "modes": [
+    "author"
+  ],
+  "entry": "SKILL.md",
+  "referencesDir": "references",
+  "versionHistory": [
+    {
+      "version": "0.8.0",
+      "date": "2026-09-04",
+      "summary": "技能目录可配置探测；半套初始化/收编可续跑；pack.ini 单源排除；版权读 git user.name；触发表收缩；可执行冒烟。"
+    },
+    {
+      "version": "0.7.0",
+      "date": "2026-09-03",
+      "summary": "收编无规范技能；目标仓 A/B 或人执行；初始化写入缺口捕捉。"
+    },
+    {
+      "version": "0.6.4",
+      "date": "2026-09-03",
+      "summary": "升级示例重写：方案七章、生成路径、同意后文件，给完全不懂的人看。"
+    },
+    {
+      "version": "0.6.3",
+      "date": "2026-09-03",
+      "summary": "示例补上初始化后如何升级、写规则、以及其余能力。"
+    },
+    {
+      "version": "0.6.2",
+      "date": "2026-09-01",
+      "summary": "zip 用英文 name，不用中文显示名。"
+    },
+    {
+      "version": "0.6.1",
+      "date": "2026-09-01",
+      "summary": "示例改成白话对话，不混内部术语。"
+    },
+    {
+      "version": "0.6.0",
+      "date": "2026-09-01",
+      "summary": "能力清单式简介；触发词工坊、占用检查、出生证明、结束绿灯。"
+    },
+    {
+      "version": "0.5.0",
+      "date": "2026-09-01",
+      "summary": "对外叙事：一次对话留下能自己发版的仓；dev.ps1；初始化结束跑审计。"
+    },
+    {
+      "version": "0.4.0",
+      "date": "2026-09-01",
+      "summary": "空仓用一次；写入基线/升级记录/本地治理提示词；README 功能清单。"
+    },
+    {
+      "version": "0.3.0",
+      "date": "2026-09-01",
+      "summary": "只初始化；examples 对话示例；不管已有 Skill 升级。"
+    },
+    {
+      "version": "0.2.0",
+      "date": "2026-09-01",
+      "summary": "空文件夹初始化：问答、git、governance/ 版本控制与打包。"
+    },
+    {
+      "version": "0.1.0",
+      "date": "2026-09-01",
+      "summary": "开发仓骨架。独立于 ChronoPM。"
+    }
+  ]
+}

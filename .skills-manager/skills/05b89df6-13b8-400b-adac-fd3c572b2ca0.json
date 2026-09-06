@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "skill_id": "05b89df6-13b8-400b-adac-fd3c572b2ca0",
+  "path": "job-research-analyst",
+  "path_key": "job-research-analyst",
+  "enabled": true,
+  "tags": [],
+  "source": {
+    "type": "local",
+    "ref": null,
+    "subpath": null,
+    "branch": null
+  }
+}

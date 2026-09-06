@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "skill_id": "f7f9bfff-8b6d-4655-9753-ba446fa005d9",
+  "path": "session-handoff",
+  "path_key": "session-handoff",
+  "enabled": true,
+  "tags": [],
+  "source": {
+    "type": "local",
+    "ref": null,
+    "subpath": null,
+    "branch": null
+  }
+}
