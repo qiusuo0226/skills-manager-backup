@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "skill_id": "f8a5fa15-0cbc-4356-91b9-125899645dff",
+  "skill_id": "5192571c-dbf4-41e4-8b7b-68cebaf1ff41",
   "path": "skill-devkit",
   "path_key": "skill-devkit",
   "enabled": true,
   "tags": [],
   "source": {
-    "type": "local",
-    "ref": null,
+    "type": "git",
+    "ref": "https://gitee.com/qiusuo0226/skill-devkit-skill",
     "subpath": null,
     "branch": null
   }

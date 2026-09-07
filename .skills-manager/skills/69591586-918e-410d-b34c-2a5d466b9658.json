@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "skill_id": "69591586-918e-410d-b34c-2a5d466b9658",
+  "path": "chrono-pm-portfolio",
+  "path_key": "chrono-pm-portfolio",
+  "enabled": true,
+  "tags": [],
+  "source": {
+    "type": "git",
+    "ref": "https://gitee.com/qiusuo0226/chrono-pm-skill",
+    "subpath": "ChronoPM-Portfolio",
+    "branch": null
+  }
+}
