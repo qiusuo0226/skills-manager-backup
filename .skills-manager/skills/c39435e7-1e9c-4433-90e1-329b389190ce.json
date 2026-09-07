@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "skill_id": "2be5c5eb-6b34-4eec-8bc7-8094e785c216",
+  "skill_id": "c39435e7-1e9c-4433-90e1-329b389190ce",
   "path": "job-research-analyst",
   "path_key": "job-research-analyst",
   "enabled": true,
   "tags": [],
   "source": {
-    "type": "local",
-    "ref": null,
+    "type": "git",
+    "ref": "https://gitee.com/qiusuo0226/job-research-analyst-skill",
     "subpath": null,
     "branch": null
   }
