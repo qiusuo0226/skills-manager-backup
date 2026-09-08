@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.1 — 2026-09-08
+
+修复 YAML `description` 折叠标量导致触发索引为空；命中词文本与三件套工作流不变。
+
+- 契约：`SKILL.md` frontmatter 由 `description: >` 改为单行双引号标量（679 字，与 `skill.json` 同文）
+- 测试：新增 `tests/test_skill_frontmatter.py`；`test_validate_deliverables.py` 的 description 长度断言改为单行双引号
+- 行为：无新的不兼容；须重装才能刷新索引。不重装则 Qoder 仍可能显示 `>`
+- 回滚：重装 0.2.0 或对照 `governance/baselines/0.2.0/`
+- CR：`CR-20260908-001`；升级记录：`upgrade-to-0.2.1.md`
+
 ## 0.2.0 — 2026-09-06
 
 求职调研请求必须触发本技能并默认产出经结构校验的标准三件套；Word 骨架按焦点领动样例加厚；无记忆时询问简历。
