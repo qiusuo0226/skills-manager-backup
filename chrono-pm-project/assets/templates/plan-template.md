@@ -4,6 +4,12 @@ plan_id: PLAN-YYYYMMDD-NNN
 project: [项目名]
 status: 正常
 superseded_by: —
+business_modules: —          # 可选检索锚点；多值用 /
+time_window: —               # YYYY-MM-DD~YYYY-MM-DD 或 —
+batch: —                     # 如 国庆 / 国庆后；不写进文件名约束
+scope_include: —
+scope_exclude: —
+related_plans: []            # [{id: PLAN-…, relation: mutually_exclusive|complement}]；取代仍用 superseded_by
 ---
 
 # 计划 - PLAN-YYYYMMDD-NNN - {计划名称}

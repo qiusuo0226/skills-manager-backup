@@ -123,9 +123,9 @@ class TestDescriptionLength(unittest.TestCase):
         import re
 
         text = (ROOT / "SKILL.md").read_text(encoding="utf-8")
-        m = re.search(r"^description:\s*>\s*\n((?:  .*\n)+)", text, re.M)
-        self.assertIsNotNone(m)
-        desc = " ".join(line.strip() for line in m.group(1).splitlines() if line.strip())
+        m = re.search(r'^description:\s+"(.*)"\s*$', text, re.M)
+        self.assertIsNotNone(m, "description must be a single-line double-quoted scalar")
+        desc = m.group(1)
         self.assertLessEqual(len(desc), 1024, len(desc))
         self.assertIn("查一下这个公司", desc)
 

@@ -8,6 +8,8 @@
 
 拆解只产需求清单条目（默认未确认），**不落待办**。
 
+**薄源（v3.26.0）**：总闸泛化材料（链接表、梳理表等无需求条款）仍建 `sources/{编号}/`：meta、_digest、facts（或空表）、ledger、parse-log、atoms 显式「本源无需求条款」。**禁止**写入 `requirement-register`。digest 写清「无 REQ」。同指纹不二次拆。
+
 过程日志：每步结束立刻写 `logs/ops/` 一行（模型/token/耗时；无接口写「未知」）。字段抽空记表 B。
 
 pending-changes 已退役，待确认进 `ai/pm-decisions.md`。

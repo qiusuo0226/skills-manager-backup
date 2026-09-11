@@ -541,7 +541,8 @@ ai/
 │   └── sources/                   # 源文档级拆解（v3.6.0 / schema 0.11.0）
 │       ├── _index.md              # 台账加速器
 │       └── {{编号}}/                # 一源文档一目录
-├── plans/                         # 计划类事实源（只放 PLAN-*.md）
+├── plans/                         # 计划类事实源（PLAN-*.md + 可选 _index 加速器）
+│   ├── _index.md                  # 计划索引（查找加速器，非存在性判据；懒建）
 │   └── PLAN-YYYYMMDD-NNN-{{name}}.md  # PLAN（§3 简表 + §4 阶段列表）
 ├── project-info/                  # 项目基本情况（v3.14.0 / schema 0.15.0）
 │   ├── progress-plan.md

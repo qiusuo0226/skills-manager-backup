@@ -23,7 +23,7 @@
 | P-CARRY | 结转 | 22 | — | 有 Python 则先本 Skill 包 `scripts/carryover_step0.py --root <项目根>`（禁止在 ai/ 或业务 cwd 找）；再 P-CARRY-WPREF（脚本已高置信回填则跳过） | 当日文件 | 改编号、改历史行；exit 0 后手搓全员；`FAIL:ROSTER_EMPTY` 仍手搓 |
 | P-CARRY-WPREF | 结转 WP Ref | 22 §5 | — | P-WF8-CARD | 仅空值高置信回填 | 猜填；改已有合法归属；无 WP 结转到今天核心表 |
 | P-SPLIT | 源文档拆解 | `source-split-skill/references/split-rules.md` | 指纹查重 | 07 REQ 上提（不落待办） | `requirements/sources/{编号}/` 六件套 | 用 outputs HTML 替代；二次拆解；会议转写/纪要当源文档 |
-| P-DOC-INGEST | 拆文件分发 | 10 源文档信号 + SKILL 路由 | 读 project-brief | 会议转写/纪要/例会导出 → WF-3，**禁止 CALL P-SPLIT**；其余 **必须 CALL P-SPLIT**；若还要报告再 P-OUTPUT | sources/ 或 meetings/ | 只出报告不入库；会议误进 sources |
+| P-DOC-INGEST | 拆文件分发 | 10 源文档信号 **或** §1.0 总闸通过且未命中约定类的可读文件 + SKILL 路由 | 读 project-brief | 会议转写/纪要/例会导出 → WF-3，**禁止 CALL P-SPLIT**；其余 **必须 CALL P-SPLIT**（无条款走薄源）；若还要报告再 P-OUTPUT | sources/ 或 meetings/ | 只出报告不入库；会议误进 sources；因「不在 L2 表」反问 |
 | P-REQ-DECOMP | 需求拆解 | 07 §3 | — | — | 需求清单 | 落待办；与 P-SPLIT 混淆 |
 | P-REQ-WP | REQ↔WP | 07 | — | — | 登记册工作包列 / WP §2 | 需求正文抄进 WP |
 | P-OUTPUT | 生成物 | 11 | P-ALWAYS 三路 | — | `ai/outputs/{批次}/` | 当事实源；替代 P-SPLIT |
@@ -43,7 +43,8 @@
 ```
 P-ROUTE
  ├─ 进入工作区 / 写事实后 → P-VIEWS
- ├─ 投喂入库 → P-INGEST-DELTA → P-RESOLVE →（命中则更新）P-VIEWS
+ ├─ 投喂入库 → 背景句 P-INGEST-DELTA → P-RESOLVE →（命中则更新）P-VIEWS
+ │                 泛化文件 P-DOC-INGEST → P-SPLIT（薄源或完整）
  ├─ 用户纠偏 → P-CORRECT → P-VIEWS
  ├─ 派活/加待办 → P-WF8 → P-CARRY → P-CARRY-WPREF → P-RESOLVE → P-WF8-DEDUP → (P-WF8-SPLIT) → P-WF8-CARD → P-BOX
  ├─ 改计划排期 → P-PLAN-SYNC →（WP 窗变）P-WP-BOX-CHK →（越界）P-BOX

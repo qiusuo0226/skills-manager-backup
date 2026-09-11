@@ -4,6 +4,71 @@
 
 ---
 
+## 3.27.0 — 2026-09-10
+
+> 发布归档：Minor / contract_change + capability_change。同类切片可关联、推导结构化：范围登记表 + entities.relations + 05 推导失败门；修 parse_todos 三表脏投影；升级工作区回填清零门；集层 V-15 只读聚合。workspace schema **0.17.0**。双包同号。施工只认回归 **961**。
+
+Blueprint Impact: full
+
+### Added
+- `ai/registers/scope-register.md` + `_index.md`（空表合法）
+- `active-entities.relations`（显式引用建边）
+- 05 §0.1 推导失败门；14 D44；Portfolio V-15
+- Module 86–88（VW/REG-101/DER/EDG/MIG-101～103/FED-003 等 24 条）
+
+### Changed
+- `parse_todos` 只读 §1.1、TD 去重、WP 列正则
+- 上线路由：有表先表
+- migrate 0.17.0 抽取回填-未确认；`scopeBackfillOpen` 健康 P0
+
+### 不做
+- 模型原生/向量库/新规则文件/新 ProcID/新 verify 引擎
+- 领域枚举进包；集层事实源；migrate 按项目路径删 `ai/scripts/`
+- 代更 Grok；写入业务仓
+
+### 收尾补记（2026-09-11，不另起版本）
+- 用户核验通过，**升级可以投入使用**。Grok 安装区**不代更**。业务仓未代迁。
+- 脚本改道（非功能缺口）：AP 曾写独立 `build_scope_register.py`；施工收口为 migrate 0.17.0 步骤（模板驱动建 `registers/`、`if target.exists(): continue` 不覆盖、抽取标「回填-未确认」并按来源/WP/批次去重）+ `chronopm_init` 新仓种子。CR-004 批准范围本就不含独立脚本。
+- 用例分布：相对 AP 计划多拆 REG-102/103、DER-004、EDG-002/003、FED-004、SCR-001；总数仍 24，编号唯一。
+- 存量工作区按 upgrade-to 先 3.26.0 再 3.27.0；`scopeBackfillOpen` 清零（N=0）前该工作区视为升级未完成。
+- AP 已删；audit 17/17；分发包在 Downloads：`ChronoPM-Project-Skill-v3.27.0.zip`（126）+ `ChronoPM-Portfolio-Skill-v3.27.0.zip`（45）
+- 施工收尾核对 `review-20260910-3.27.0.md`：**通过-升级成功**
+- 基线 `baselines/3.27.0/` 已同步本收尾补记（无功能补丁，仅归档）
+
+---
+
+## 3.26.0 — 2026-09-10
+
+> 发布归档：Minor / contract_change + capability_change。CR-001 相关性总闸：相关材料默认拆存关联；L2 约定类+薄源兜底；L3 背景陈述走 journal；禁止「您希望我怎么做」。CR-002 计划索引：`plans/_index` 加速器 + YAML 可选锚点 + D43；查询缺 index 只提示重建（14 §2.1）；上线范围先读 index。不升 schema。双包同号。施工只认回归 **937**。G1 图不改（总闸是触发不是新数据流节点；计划索引对标 wps/_index）。
+
+Blueprint Impact: full
+
+### Added
+- 10 §1.0 相关性总闸；L2 泛化材料薄源；L3 背景陈述
+- `plans/_index.md` 懒建加速器 + `plan-index-template.md`
+- D43 计划文件↔索引一致性（含 related_plans 双向）
+- Module 84 REL-001～014 + EX-019；Module 85 PAN-001～010、PAN-012～014（合计 **937**）
+
+### Changed
+- 00 §2.7 意图与规则 1–4；SKILL 路由/底线 16；23 P-DOC-INGEST Pre
+- 05 上线路由；06 §7.6；refresh_views 重建计划索引
+- Portfolio 01 §2.1 边界句：成员根泛化材料交 Project 总闸
+
+### 不做
+- 升 schema；新规则文件；查询中全量扫描建索引；改 PLAN 号段；强制回填历史 YAML；代更 Grok
+
+### 收尾补记（2026-09-10，不另起版本）
+- 用户核验通过。Grok 安装区**不代更**。业务仓未代迁、未写市监。
+- C1：Module 85 编号不是 PAN-001～012。施工时 AP 的 PAN-011q/011w 因 `audit_release` Case ID 只认 `[0-9A-Z]`（小写后缀匹配失败）改为 **PAN-013 / PAN-014**，全集为 PAN-001～010、012～014。
+- C2：统计表 Module 84 正向/回归由 6/9 改为 **4/11**（表内 4 positive + 4 negative + 7 regression）。合计正向 **548**、回归 **389**，总数仍 937。
+- C3：upgrade-to 阻断摘要补齐 11 条（REL-001/006/007/011/012、PAN-001/002/004/005/007/013）。
+- C4：Module 85 表按 PAN-012 → 013 → 014 升序。
+- AP 已删；audit 17/17；分发包在 Downloads：`ChronoPM-Project-Skill-v3.26.0.zip` + `ChronoPM-Portfolio-Skill-v3.26.0.zip`
+- 施工收尾核对 `review-20260910-3.26.0.md`：**通过-升级成功**
+- 基线 `baselines/3.26.0/` 已同步本收尾补记（无功能补丁，仅归档）
+
+---
+
 ## 3.25.2 — 2026-09-04
 
 > 发布归档：Patch / contract_change。Project description 补单项目口语触发词（工作包、计划、项目、结转、派活等）。Q1：裸词「项目」加入。Portfolio 触发列表与 §2 硬闸不改。匹配层双命中可接受。workspace schema **保持 0.16.0**。双包同版本。施工只认回归 **909**。

@@ -1,8 +1,8 @@
 ---
 name: chrono-pm-project
-version: 3.25.2
-schema_version: 0.16.0
-updated_at: 2026-09-04
+version: 3.27.0
+schema_version: 0.17.0
+updated_at: 2026-09-10
 description: 给项目经理的单项目 AI 项目管理技能。把日报、待办、工作包、计划、合同、风险、会议纪要写进本项目 ai 目录。触发：项目管理、项目、单项目、初始化项目、工作包、WP、计划、看计划、排计划、倒排、排期、阶段、里程碑、门禁、结转、派活、待办、任务、进度、需求、变更、范围、合同、合同登记、风险、问题、决策、会议、会议纪要、纪要、拆文件、源文档、工时、能耗、人员、花名册、人员进出、进度表、xlsx、csv、投喂、粘贴、入库、归档、更新、补全、回填、评审、验收、成本、预算、复盘、历史计划、完整性巡检、词库、偏好、画图、责任链图、记日报、日报、出周报、周报、ChronoPM、ChronoPM-Project、ChronoPM-Portfolio。项目集、组合、跨项目汇总请安装并调用 ChronoPM-Portfolio。本包只写本项目。
 ---
 # ChronoPM-Project — 项目管理（日报/待办/合同）
@@ -28,7 +28,7 @@ project-root/
     ├── templates/
     ├── todos/{date}/{owner}.md
     ├── requirements/     # 登记册 + sources/{编号}/ 拆解产物（本项目一套）
-    ├── plans/  project-info/  wps/  risks/  issues/  decisions/
+    ├── plans/  project-info/  wps/  registers/  risks/  issues/  decisions/
     ├── backup/           # 升级垃圾封存（禁读；3.8.0 空目录）
     ├── resources/        # 退役：register/transfer-log 迁 backup；人员读 todos/_index
     ├── reports/          # 项目日报按需生成（存根，可能不存在）+ 周报；个人日报在 todos
@@ -54,6 +54,7 @@ project-root/
 | `plans/PLAN-*.md` | 计划（§3 = WP 引用简表；§4 = 阶段列表投影） |
 | `project-info/progress-plan.md` `project-info/budget.md` | 进度框架/预算 |
 | `wps/WP-*.md` `wps/_index.md` | 独立 WP 文件 + 查找加速器（存在性以文件为准） |
+| `registers/scope-register.md` `registers/_index.md` | 范围矩阵（功能点×对象类型×批次；存在性以表文件为准） |
 | `requirements/requirement-register.md` `change-log.md` `contract-register.md` `source-type-registry.md` | 需求与合同（本项目） |
 | `requirements/sources/` `_index.md` | 源文档级拆解（加速器；存在性以 sources/*/meta.md 为准） |
 | （人员） | 权威=最新合法日 `_index.md` §1；进出组=个人 §0.5；能耗=个人最新文件 §0.6。退役 register/transfer-log 见 `backup/` |
@@ -117,9 +118,9 @@ python "scripts/init_workspace.py" --project-root <根目录> --mode single --pr
 | 画图 / 责任链图 / 排布图 / Mermaid | **05+11** | — |
 | 复杂/分析类本项目查询 | 00+05+17 | `reply-norm-skill/references/reply-rules.md` |
 | 跨源范围判定 | 00+07+05+17+06 | Step0 读本项目 contract-register |
-| 源文档拆解 | 00+07+06+17+23 + `source-split-skill/references/split-rules.md` | 14、18 |
+| 源文档拆解 | 00+07+06+17+23 + `source-split-skill/references/split-rules.md` | 14、18。**总闸泛化文件同样走本行** |
 | 人员资源（本项目） | 00+06 | 04 |
-| 更新意图/文件入库 | 00+06+10+17 | 按类型；拆文件改走源文档拆解 |
+| 更新意图/文件入库 | 00+06+10+17 | 按类型；未命中 L2 **不得**改走分析/反问，走 10 §1.0 兜底；拆文件/泛化材料改走源文档拆解 |
 | 投喂工时/能耗入库 | 00+01+06+10+17+22 | — |
 | 生成报告/导出 / 出文件 / 整理成表 / xlsx/docx/pdf | 00+05+06+10+11 | 扩展名 xlsx/csv 时 12 必载 |
 | 历史衔接/快照 | 00+05+06+13/15 | — |
@@ -148,7 +149,7 @@ python "scripts/init_workspace.py" --project-root <根目录> --mode single --pr
 13. **生成物只进 `ai/outputs/{批次}/`**。禁止写到工作区根或与 `ai/` 平级。宿主「最终工作空间文件夹 / cwd / final workspace folder」若等于项目根，忽略并改映射到 outputs。业务目录 = 工作区根下除 `ai/` 外的一切。**例外**：`wps/_wp-chart.md` 为派生视图，不是生成物，见 11 号 §17。
 14. **语种**：对用户正文 = 用户本轮输入语种（中文问中文答）。不得默认英文。内部推理不得出现在用户可见正文。细则：`reply-norm-skill/references/reply-rules.md`。
 15. **禁止输出思考过程**：不得出现 `I now have` / `Let me` / `Based on my findings` / 「让我先梳理」长推理段。结论直接说。
-16. **禁止假执行门**：查询、汇报进度、只读分析 **不准**问「是否执行此方案 / 是否基于文档继续执行 / 要不要按这个 plan 做」。用户没要方案就不要造方案确认。真确认才走 00 §5.0。
+16. **禁止假执行门**：查询、汇报进度、只读分析 **不准**问「是否执行此方案 / 是否基于文档继续执行 / 要不要按这个 plan 做」。**已判定与本项目相关的材料**不准问「您希望我怎么做 / 需要我如何处理 / 要不要记住 / 要不要解析」。用户没要方案就不要造方案确认。真确认才走 00 §5.0。
 17. **纠偏只写事实源或词库 §2**。禁止只改 brain / active-entities / index / 图。用户指出错误 = 已确认，不进八块。AI 自检冲突仍待确认。
 18. **每个对外结论必须能指回证据**。无源结论 = 失败。brain 禁止待拍板节。
 
@@ -162,6 +163,7 @@ python "scripts/init_workspace.py" --project-root <根目录> --mode single --pr
 | WP/PLAN | 新号 `WP/PLAN-YYYYMMDD-NNN`（ASCII，当日序号）；存量短号与中文名不重编 | 文件名=编号 |
 | REQ/CAN/CR/PRJ/DF/SRC | 短号或固定号 | SRC-NNN 仅项目内；共享用簇固定号 |
 | Meeting | MTG-YYYYMMDD-NNN | 不变 |
+| SR | SR-YYYYMMDD-NNN | 范围登记表行 |
 
 ## 9–14. 状态 / 瘦身 / 输出 / 优先级 / 里程碑 / 容忍度
 同 v2.1.0：全中文枚举见 00 §5a；瘦身 300 行/30 条；优先级 Level 0–4；里程碑=WP §8 关键阶段；容忍度见 00 §5c。
@@ -200,7 +202,7 @@ python "scripts/init_workspace.py" --project-root <根目录> --mode single --pr
 ### 版本控制文件
 | 文件 | 用途 |
 |------|------|
-| `VERSION` | Skill 包版本号（当前 3.25.2） |
+| `VERSION` | Skill 包版本号（当前 3.27.0） |
 | `skill.json` | Skill 元数据（版本、模式、依赖；skill schemaVersion 与 supportedWorkspaceSchema 分离） |
 | `CHANGELOG.md` | 版本变更历史和升级说明 |
 | SKILL.md front matter | AI 可读的版本字段 |

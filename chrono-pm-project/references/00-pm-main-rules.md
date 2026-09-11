@@ -77,11 +77,11 @@ AI 在处理任何用户输入时，必须先完成 PM Profile 加载，再判�
 | 查询 | 用户想了解项目状态 | 按 `05-query-rules.md` 处理，不输出更新清单 |
 | 画图 / 责任链图 / 排布图 / Mermaid | 由 index 派生图 | **查询**，不是生成。按 05 + 11 §17。对话输出 Mermaid。允许懒建派生 `wps/_wp-chart.md`。禁止 `ai/outputs/`，不走 P-OUTPUT |
 | 生成 | 用户要求生成文档 | 按对应场景规则处理 |
-| 分析 | 用户要求分析材料 | 输出分析结论 + 建议事项 |
+| 分析 | 用户要求分析材料 | 输出分析结论 + 建议事项。**同句含项目新事实或相关文件 → 按入库（10 §1.0），禁止停在分析** |
 | 更新 | 用户要求更新事实源 | 按 `10-update-trigger-rules.md` 处理 |
 | 归档 | 用户要求归档文件 | 按文件类型归档到对应目录 |
-| 文件解析入库 | 用户上传/粘贴过程记录（日报/纪要/工时） | 先读 `project-brief.md` 判断归属，再按 `10-update-trigger-rules.md` 处理 |
-| 源文档拆解入库 | 用户说拆文件/拆文档/把文档拆进工作区/入库源文档 | 必须走 23 P-DOC-INGEST → P-SPLIT，产物 `requirements/sources/{编号}/`。禁止用 11 号 HTML 或其他 Skill 替代入库。**会议转写/纪要/例会导出除外（走 WF-3）**；仅当用户明示把会议拆进 `sources/` 才走本行 |
+| 文件解析入库 | 用户上传/粘贴/**丢进**任何与本项目相关的材料（不限日报/纪要/工时；含 xlsx/csv/docx/粘贴表/背景句） | 先读 `project-brief.md` 走 10 §1.0 总闸，再按类型或薄源入库。未命中 L2 不得改走分析/反问 |
+| 源文档拆解入库 | 用户说拆文件/拆文档/把文档拆进工作区/入库源文档，**或**总闸通过且未命中约定类的可读文件 | 必须走 23 P-DOC-INGEST → P-SPLIT。无需求条款走薄源。禁止用 11 号 HTML 替代。**会议转写/纪要/例会导出除外（走 WF-3）** |
 | 初始化 | 用户要求初始化项目、录入项目信息、设置项目基线 | 按 `18-init-wizard-rules.md` 执行六步向导 |
 | 完整性巡检 | 用户要求巡检、检查完整性、列出缺失信息、补全提醒 | 按 `19-info-completeness-rules.md` 执行巡检并输出报告 |
 | 历史计划批量导入 | 用户要求把存量计划（.pod / Excel）批量导入/回溯灌入快照 | 按 `15-snapshot-rules.md` §8a（R1）执行 external_import |
@@ -96,10 +96,10 @@ AI 在处理任何用户输入时，必须先完成 PM Profile 加载，再判�
 
 **规则：**
 
-1. 若存在更新意图或强管理信号，AI 必须主动进入更新触发流程（详见 `10-update-trigger-rules.md`），而不是仅做解释性回答。同一句同时像「分析」又像「记录/整理/补全」→ **按入库**，禁止停在分析。
-2. 即使用户未明确说"更新"，但内容中出现需求/任务/风险/问题/决策/资源/评审等信号词时，AI 也应主动提示候选更新。
-3. AI 处理用户上传或粘贴的文件前，必须先读取 `context/project-brief.md`，判断文件内容与当前项目的关联度，再决定处理方式。
-4. 关联度低时，AI 应提示用户确认是否需要纳入管理，不自行假设。
+1. 若存在更新意图、强管理信号、**或总闸判定与本项目相关**，AI 必须进入更新触发流程（`10-update-trigger-rules.md` §1.0），而不是仅做解释性回答。同一句同时像「分析」又像记录/投喂 → **按入库**，禁止停在分析。
+2. 即使用户未说「更新」，相关事实默认入库+回执，不问「要不要记住」。纯问句仍走 05。
+3. AI 处理用户上传或粘贴的文件前，必须先读取 `context/project-brief.md`，判断关联度，再按总闸处理。
+4. 关联度低：噪声剔除或只问归属。禁止把相关材料问成「您希望我怎么做」。高风险仍确认后写。
 5. 涉及"历史计划/存量计划"的导入意图，先按 `13-continuity-rules.md` §2 判定属于 R1（当前工作区存量计划）还是 13 号（跨阶段衔接），再路由对应规则。
 6. **备忘建议输出点**：主体任务处理后，若对话命中方法论/干系人/洞察/策略类信号，附加输出"💡 检测到 N 条候选备忘（#方法论/#干系人/#洞察/#策略），是否记入 project-notes？"（PM 确认后写入 `ai/.../context/project-notes.md`；否定则不记录，不阻塞主体任务）。详见 `07-requirement-rules.md` §8.8（随笔准则）与 `assets/templates/project-notes-template.md`。
 
@@ -171,6 +171,7 @@ AI 在执行任何写入操作前，必须先读取并确认当前版本规则�
 **强制流程**：
 1. 扫描本次变更涉及的工作包编号与时间盒
 2. 回写对应 `wps/WP-*.md` 的开始/结束与 `wps/_index.md` 镜像
+2.5 **计划索引（v3.26.0）**：新建/改 PLAN 后更新 `plans/_index.md` 对应行（YAML 锚点镜像；能从目标/门禁抽出则写入 YAML，抽不出列 `—`）。近义标题且无 `related_plans` → SUGGEST 一次互指（须双向；取代仍用 `superseded_by`）。有 Python 则本轮 P-VIEWS 重建索引。缺 index 在**写入路径**按模板建。禁止改文件名来编码批次。**纯查询不得为建索引全量扫描**（14 §2.1）。
 3. **禁止**按人员×日期把原子待办灌进 `todos/`
 4. 待办从已规划工作包拆给执行人（WF-8 入口④），不从计划行展开
 5. 输出「计划↔工作包同步」：列出本次更新了哪些 WP
@@ -846,7 +847,7 @@ YAML：`effect: 正常|废弃`（缺省=正常）；废弃必填 `superseded_by`
 
 ### P-VIEWS / P-RESOLVE / P-CORRECT（v3.21.0）
 
-**P-VIEWS**：写事实成功后、进入工作区后，有 Python 则跑 `refresh_views.py --all`。无 Python 则视图 AUTO 兜底。缺 `.state.json` = 全部 stale。查询准入只比 `facts_fingerprint`；写盘时 facts 或 journal 任一变化都重建。
+**P-VIEWS**：写事实成功后、进入工作区后，有 Python 则跑 `refresh_views.py --all`。无 Python 则视图 AUTO 兜底。缺 `.state.json` = 全部 stale。查询准入只比 `facts_fingerprint`；写盘时 facts 或 journal 任一变化都重建。写 `registers/scope-register.md` / WP§3 / PLAN 范围字段后必须 P-VIEWS。`active-entities.relations` 是派生，禁止手改（同底线 17）。
 
 **P-RESOLVE**：对齐只查 `active-entities.json`。类型序：精确编号 → wp/td → term 第二跳（canonical + 开办/变更/注销收口）→ person（仅指人）。禁止跳过 term 猜 WP，禁止全库语义扫。
 
