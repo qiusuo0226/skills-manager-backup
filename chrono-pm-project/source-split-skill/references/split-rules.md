@@ -47,7 +47,20 @@ SRC-NNN **不得**作跨项目互认键。
 
 #### 目录与加载
 
-`requirements/sources/{编号}/`：meta.md、_digest.md、atoms.md（或 `atoms/` 分片）、facts.md（或 `facts/`）、ledger.md、parse-log.md。查询先读 `sources/_index.md` → `_digest.md` → 取证才读 atoms/facts。存在性以 `sources/*/meta.md` 为准。
+`requirements/sources/{编号}/`：meta.md、_digest.md、atoms.md（或 `atoms/` 分片）、facts.md（或 `facts/`）、ledger.md、parse-log.md、可选 `original.*`、可选 `figures/`（抽出佐证图，懒建）。查询先读 `sources/_index.md` → `_digest.md` → 取证才读 atoms/facts。存在性以 `sources/*/meta.md` 为准。
+
+#### 抽出佐证图（v3.29.0）
+
+能抽则抽关系图 / 架构图 / 带题注附图。装饰性跳过。失败不阻断文字拆解。
+
+1. 文件落 `requirements/sources/{编号}/figures/`，文件名 `FIG-{源编号}-{NNN}.webp`（失败留 png）。**文件名约定，不是运行时实体 ID。**
+2. 同目录懒建 `_index.md`：`文件名 | atom_id | 页码 | 题注 | 相对路径`。深度 1。
+3. ATOM evidence 引相对路径（如 `figures/FIG-SRC-001-001.webp`）。
+4. 抽不出像素：文字照拆；回执声明「图仍在原件」；不假装有图。
+5. 大图压缩或缩最长边；失败则索引只留 original 页码指针。
+6. **与 `requirements/artifacts/` 互斥**：源抽出图禁止写入 artifacts/；外链原型压缩截图禁止写入 figures/。
+
+回执含抽出图数量；零张须声明。
 
 #### 同源判定与接收侧对账 WF-SD-1
 

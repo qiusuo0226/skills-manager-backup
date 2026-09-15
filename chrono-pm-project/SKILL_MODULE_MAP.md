@@ -242,7 +242,7 @@ flowchart LR
 ```mermaid
 flowchart LR
   U[用户提问] --> R{简单查询?}
-  R -->|是| S[SKILL底线14-16 + 05短条]
+  R -->|是| S[SKILL底线14-16+19 + 05短条]
   R -->|写入/确认/方案/复杂| RN[reply-norm-skill reply-rules]
   RN --> C{真确认?}
   C -->|是| S50[00 5.0]

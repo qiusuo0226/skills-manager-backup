@@ -1,7 +1,7 @@
 {
   "name": "chrono-pm-project",
   "displayName": "ChronoPM-Project — 项目管理（日报/待办/合同）",
-  "version": "3.27.0",
+  "version": "3.29.0",
   "schemaVersion": "0.7.0",
   "supportedWorkspaceSchema": {
     "min": "0.1.0",
@@ -107,6 +107,16 @@
     "python": ">=3.9"
   },
   "versionHistory": [
+    {
+      "version": "3.29.0",
+      "date": "2026-09-13",
+      "summary": "投喂一次做完（底线20；投喂不问绑包、口述仍问）+ 源文档抽出图 figures/。schema保持0.17.0。双包同版本。Module 90+91（总计980）。"
+    },
+    {
+      "version": "3.28.0",
+      "date": "2026-09-11",
+      "summary": "对外拍板禁止技能黑话：底线19分段+五句自检；00拆段补词典；reply-rules对错例；待办编号除外。schema保持0.17.0。双包同版本。Module 89（总计964）。"
+    },
     {
       "version": "3.27.0",
       "date": "2026-09-10",
@@ -564,8 +574,8 @@
     }
   ],
   "blueprint": {
-    "lastUpdated": "2026-09-10",
-    "lastVersion": "3.27.0",
+    "lastUpdated": "2026-09-13",
+    "lastVersion": "3.29.0",
     "updateRequiredOn": [
       "major",
       "minor",

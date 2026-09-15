@@ -4,8 +4,8 @@
 
 | 文件 | 触点 |
 |---|---|
-| `SKILL.md` | §7 底线 14–16；路由「问答规范」；规则索引本目录 |
-| `references/05-query-rules.md` | 简单查询短条与底线 14–16 同文 |
+| `SKILL.md` | §7 底线 14–16 与 19；路由「问答规范」；规则索引本目录 |
+| `references/05-query-rules.md` | 简单查询短条与底线 14–16 同文；拍板另守 19（节题不改） |
 | `references/00-pm-main-rules.md` | §5.0 指针：细则见本目录；何时准问执行 |
 | `references/21-pm-profile-rules.md` | DF-005 / DF-006 指针到 reply-rules |
 | `references/23-procedure-index.md` | P-REPLY |

@@ -4,6 +4,73 @@
 
 ---
 
+## 3.29.0 — 2026-09-13
+
+> 发布归档：Minor / capability_change + contract_change。投喂一次做完（底线 20；投喂路径不问绑包，口述仍问）；源文档抽出佐证图落到该源 `figures/`，不与原型截图混放。workspace schema **0.17.0** 不变。双包同号。施工只认回归 **980**。无工作区迁移。
+
+Blueprint Impact: full
+
+### Added
+- SKILL.md 底线 20：投喂本轮必须落下原文+能绑的包+已发生卡住；禁止下次再对包
+- `sources/{编号}/figures/` 懒建抽出图 + `_index.md`；07 §8.10.3 点4
+- Module 90（ING-101～111）+ Module 91（FIG-001～005）
+
+### Changed
+- 01 §1.4/Q-7：投喂唯一包 auto 绑，否则待归属不问；切断回落 WF-8 问绑
+- 01 L42 / 22 ELSE：澄清既有跳过；缺人仍 Step 0
+- 04 卡住高置信单条 auto 不问认；关闭仍确认
+- Portfolio：抽出行即交接；按项目独立写任务；低置信仍问归属
+- 06 §2.1 登记 figures/ 与既有 artifacts/
+
+### 不做
+- 废止 BS-018/019；新造未绑包标记；源图混 artifacts/；FIG 实体 ID
+- Obsidian wikilink；升 schema；工作区迁移；代更 Grok；写入业务仓
+
+### 收尾（2026-09-13）
+- audit 17/17 通过。用户授权执行、tag、分发包。Grok 不代更。业务仓未代迁。schema 仍 0.17.0。
+- 分发包：`ChronoPM-Project-Skill-v3.29.0.zip`（129）+ `ChronoPM-Portfolio-Skill-v3.29.0.zip`（46）
+- 基线 `baselines/3.29.0/`。AP 已删。
+- 现场抽题（投喂不问绑包、口述仍问、图可出示）由使用方在真实工作区核验。
+
+### 收尾补记（2026-09-14，不另起版本）
+- 用户指示收尾。**升级可以投入使用。** Grok 安装区**不代更**。业务仓未代迁。schema 仍 0.17.0。
+- AP 已删；audit 17/17；分发包在 Downloads：`ChronoPM-Project-Skill-v3.29.0.zip`（129）+ `ChronoPM-Portfolio-Skill-v3.29.0.zip`（46）
+- 施工收尾核对 `review-20260913-3.29.0.md`：**通过-升级成功**
+- 基线 `baselines/3.29.0/` 已同步本收尾补记（无功能补丁，仅归档）
+
+---
+
+## 3.28.0 — 2026-09-11
+
+> 发布归档：Minor / contract_change。对外拍板禁止技能黑话：入口底线 19（分段 + 五句自检）；00 确认专节拆段并补词典；问答规范加本翻车对错例；查询待办编号除外。workspace schema **0.17.0** 不变。双包同号。施工只认回归 **964**。无工作区迁移。
+
+Blueprint Impact: metadata-only
+
+### Added
+- SKILL.md 底线 19：汇报/拍板分段；拍板零黑话；五句自检过不了 = 本轮失败
+- 00 词典 5 行（范围草稿 / 结构版本 / 登记行号 / 计划编号问句 / 脚本名）
+- Module 89（RN-012/013/014）
+
+### Changed
+- 00 §5.0 强制同一轮两段；失败标准覆盖结构版本/回填状态
+- reply-rules：14–16 同文、19 指针分家；正反例本翻车一行
+- 05：节题不动；正文 19 短指针；待办清单除外
+- 20 健康报告属汇报段；23 P-REPLY Forbidden；Portfolio 对外同口径一句
+- SKILL_MODULE_MAP L245 含 19
+
+### 不做
+- 新规则文件 / 新 ProcID / 脚本扫对外正文 / 每轮加载 reply-norm / 入口堆词表
+- 覆盖确认分级（SG-20260831-006）；升 schema；工作区迁移
+- 代更 Grok；写入业务仓
+
+### 收尾（2026-09-11）
+- audit 17/17 通过。B3 施工结果合格。用户授权收尾提交、tag、分发包。
+- 分发包：`ChronoPM-Project-Skill-v3.28.0.zip`（127）+ `ChronoPM-Portfolio-Skill-v3.28.0.zip`（45）
+- 基线 `baselines/3.28.0/`。Grok 安装区不代更。业务仓无结构迁移。
+- 对话行为级现场抽题（「有什么需要我决策的吗」）静态审计不能代跑，由使用方在真实工作区核验。
+
+---
+
 ## 3.27.0 — 2026-09-10
 
 > 发布归档：Minor / contract_change + capability_change。同类切片可关联、推导结构化：范围登记表 + entities.relations + 05 推导失败门；修 parse_todos 三表脏投影；升级工作区回填清零门；集层 V-15 只读聚合。workspace schema **0.17.0**。双包同号。施工只认回归 **961**。

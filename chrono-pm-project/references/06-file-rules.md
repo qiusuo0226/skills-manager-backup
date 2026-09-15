@@ -139,6 +139,8 @@ requirements/sources/{编号}/parse-log.md
 requirements/sources/{编号}/atoms.md（或 atoms/ 分片，>300 条或 >1500 行；软阈值可在本文件本条调整）
 requirements/sources/{编号}/original.*（原件副本；弱结构投喂 / 源文档均允许）
 requirements/sources/{编号}/rows.md（抽出行；`source_type=weak_ingest` 时必有。weak_ingest **不进** ATOM / canonical / scope_scope）
+requirements/sources/{编号}/figures/（源文档抽出佐证图，懒建；缺了不健康失败）
+requirements/artifacts/（07 §8.10.3.2 原型压缩截图，对账既有；不是源条款图）
 requirements/canonical/canonical-index.md
 requirements/canonical/CAN-*.md
 requirements/atoms/atom-index.md

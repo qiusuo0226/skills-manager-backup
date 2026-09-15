@@ -262,6 +262,7 @@ kind            : requirement / requirement_directive / agreement / constraint /
 source_doc      : 文档名
 source_version  : 源文档版本号（stale 检测基准）
 source_ref      : 条款号 / 章节 / 页码
+figure_ref      : 可选；源抽出图相对路径（`figures/FIG-….webp`）。无图则 —
 source_type     : registry 细粒度类型
 source_category : 6 类之一
 authority       : L1~L5（由 source_category 默认推断，可覆盖）
@@ -437,8 +438,9 @@ Step 3  输出 scope_scope(result) + contract_refs + 证据链
 #### 8.10.3 原型与非文本内容存储原则
 
 1. 原型/截图等文件本身**不放入工作区**（避免体积膨胀），仅在 REQ 的"原型/文档链接"字段存指针（外部路径/URL）。
-2. 需要 AI 查看时，可将压缩截图放入 `requirements/artifacts/`，AI 通过读图能力辅助理解；文字化描述由 PM 补充或 AI 基于命名生成（SUGGEST → 待确认）。
+2. 需要 AI 查看时，可将压缩截图放入 `requirements/artifacts/`，AI 通过读图能力辅助理解；文字化描述由 PM 补充或 AI 基于命名生成（SUGGEST → 待确认）。本目录只承载原型读图辅助，**不是**源文档抽出条款图。
 3. 原型作为 ATOM 证据来源时，走 `prototype` source_type 提取其文字说明部分。
+4. **源文档抽出佐证图（v3.29.0）**：P-SPLIT 从已入库源文档抽出的关系图/架构图/带题注附图，落 `requirements/sources/{编号}/figures/`（压缩 webp，失败留 png）。ATOM evidence 引相对路径。与点 2 互斥：原型读图辅助 → artifacts/；源条款佐证 → figures/。禁止把源抽出图写入 artifacts/；禁止把外链原型截图写入 figures/。外链原型仍走点 1 指针。
 
 #### 8.10.4 日报场景数据链路
 
