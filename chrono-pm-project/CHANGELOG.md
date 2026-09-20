@@ -4,6 +4,54 @@
 
 ---
 
+## 3.30.1 — 2026-09-20
+
+> Patch。主题页过期检测补 ledger 原件指纹；无 Python 属性串写进 digest-schemas；missing_page 巡检提示不阻断；skip 比较去掉 as_of。schema **0.17.0** 不变。双包同号。施工只认回归 **997**。
+
+Blueprint Impact: metadata
+
+### Fixed
+- `collect_source_digest_status` 比对 ledger `source_fingerprint`；失配 `stale`/`reason=source`
+- skip 等值比较剔除 `as_of`，避免每日首次无变化写盘
+
+### Changed
+- digest-schemas：属性串格式（`路径:size:mtime秒` 以 `|` 连接）
+- 19 §3.3b：`missing_page` 提示不阻断
+- Module 92 增 SW-017
+
+### 收尾补记（2026-09-20，不另起版本）
+- 用户指示收尾。**升级可以投入使用。** Grok 安装区**不代更**。业务仓未代迁。schema 仍 0.17.0。
+- 3.30.0 单源主题页 + 3.30.1 原件指纹补丁一并收口。audit 17/17。回归 **997**。
+- 分发包：`ChronoPM-Project-Skill-v3.30.1.zip`（132）+ `ChronoPM-Portfolio-Skill-v3.30.1.zip`（46）
+- 基线 `baselines/3.30.1/`。AP 已删。
+
+---
+
+## 3.30.0 — 2026-09-20
+
+> 发布归档：Minor / capability_change + contract_change。标准文档拆完后 `_digest.md` 编成单源主题页；查询过期读 `.state.json.source_digest_status`；`refresh_views.py` 只检测不重编。workspace schema **0.17.0** 不变。双包同号。施工只认回归 **996**。无工作区迁移。
+
+Blueprint Impact: full
+
+### Added
+- `source-split-skill/references/digest-schemas.md`：6 类栏目 + 5 特化
+- Module 92（SW-001～016）
+- `refresh_views.py --print-slice-fp`；`.state.json.source_digest_status`
+
+### Changed
+- `_digest.md` 从摘要改为按类型栏目的主题页；协调者收尾编译
+- 05 源文档行读过期字段；00 P-CORRECT 改切片须同轮重编
+- SKILL.md 底线 17 禁手改 `_digest`
+- 10 号「编成页」仅已拆源
+
+### 不做
+- `ai/wiki/` 目录；升 schema；migrate；第 8 列；atoms 并入 facts 指纹；脚本重编页；Obsidian wikilink；集层编页
+
+### 收尾补记（2026-09-20）
+- 本版由 3.30.1 收口投入使用（原件指纹补丁）。不另打 `v3.30.0-close`。
+
+---
+
 ## 3.29.0 — 2026-09-13
 
 > 发布归档：Minor / capability_change + contract_change。投喂一次做完（底线 20；投喂路径不问绑包，口述仍问）；源文档抽出佐证图落到该源 `figures/`，不与原型截图混放。workspace schema **0.17.0** 不变。双包同号。施工只认回归 **980**。无工作区迁移。
