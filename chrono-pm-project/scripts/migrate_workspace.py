@@ -33,6 +33,30 @@ from pathlib import Path
 # 避免在迁移脚本内硬编码版本字符串造成与 Skill 本体版本失步。
 from _version import SKILL_VERSION as CURRENT_SKILL_VERSION
 from _version import WORKSPACE_SCHEMA_VERSION as CURRENT_SCHEMA_VERSION
+
+
+def _project_root_from_ai(ai_dir: Path) -> Path:
+    return ai_dir.parent if ai_dir.name == "ai" else ai_dir
+
+
+def ensure_stock_compiled(ai_dir: Path, dry_run: bool = False) -> bool:
+    """3.30.2 存量闸：未过不得盖戳。集根跳过（成员根各自跑）。"""
+    ai = ai_dir
+    if (ai / "portfolio").is_dir() and (ai / "projects").is_dir():
+        print("  集根不编成员主题页；各成员根自行 compile")
+        return True
+    try:
+        from compile_source_digests import compile_workspace
+    except ImportError as e:
+        print(f"  FAIL 无法导入 compile_source_digests.py: {e}")
+        return False
+    root = _project_root_from_ai(ai)
+    code = compile_workspace(str(root), dry_run=dry_run, check_only=False)
+    if code != 0:
+        print("  存量未完成，不得更新 skillVersion，不得称升级成功")
+        return False
+    print("  存量检查通过")
+    return True
 from chronopm_init.config import (
     ALL_TEMPLATE_FILES,
     RETIRED_TEMPLATE_FILES,
@@ -2181,7 +2205,10 @@ def migrate_workspace(project_root: str, dry_run: bool = False, target_version: 
     print(f"目标 Schema: {CURRENT_SCHEMA_VERSION}")
 
     if current_ws_version == skill_version and current_schema == CURRENT_SCHEMA_VERSION:
-        print(f"\n✅ 版本已匹配，无需迁移")
+        print(f"\n版本已匹配，仍跑存量检查")
+        if not ensure_stock_compiled(ai_dir, dry_run):
+            return
+        print(f"\n✅ 版本已匹配且存量已过")
         return
 
     # 3. 检测缺失能力
@@ -2339,7 +2366,9 @@ def migrate_workspace(project_root: str, dry_run: bool = False, target_version: 
         return
 
     if not missing_dirs and not missing_files:
-        print(f"\n✅ 目录和文件已完整，仅更新版本号")
+        print(f"\n✅ 目录和文件已完整，先存量再更新版本号")
+        if not ensure_stock_compiled(ai_dir, dry_run=False):
+            return
         old_version = update_version_file(ai_dir, mode, skill_version)
         append_migration_log(ai_dir, old_version, [], [], skill_version)
         print(f"\n✅ 版本已更新到 {skill_version}")
@@ -2377,7 +2406,10 @@ def migrate_workspace(project_root: str, dry_run: bool = False, target_version: 
         rebuild_index_recent(ai_dir, days=7 if index_mode == "recent-7-days" else 30)
         print(f"  ✓ 待办索引已重建")
 
-    # 更新版本号
+    # 更新版本号（先存量）
+    print(f"\n存量处理...")
+    if not ensure_stock_compiled(ai_dir, dry_run=False):
+        return
     print(f"\n更新版本号...")
     old_version = update_version_file(ai_dir, mode, skill_version)
     print(f"  ✓ {old_version} → {skill_version}")

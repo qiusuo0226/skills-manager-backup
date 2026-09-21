@@ -6,7 +6,7 @@
 
 ## 谁写
 
-工人只写 atoms/facts 分片与抽出图。**协调者收尾编译** `_digest.md`。
+工人只写 atoms/facts 分片与抽出图。**日常收尾**：协调者编译 `_digest.md`。**升级执行**：`compile_source_digests.py` 批量回填 missing/old/stale 页。日常 `refresh_views.py` 只检测、不写页。
 
 ## frontmatter
 
@@ -48,7 +48,7 @@ digest_schema: contractual
 
 ## 过期（查询侧）
 
-脚本 `collect_source_digest_status` 写入 `.state.json.source_digest_status`。**禁止**并入 `facts_fingerprint`。脚本只报告、不重编页。
+脚本 `collect_source_digest_status` 写入 `.state.json.source_digest_status`。**禁止**并入 `facts_fingerprint`。日常脚本只报告、不重编页。升级执行写页见 `compile_source_digests.py`。
 
 | status | 条件 |
 |---|---|

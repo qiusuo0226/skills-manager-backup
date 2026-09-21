@@ -1,7 +1,7 @@
 {
   "name": "chrono-pm-project",
   "displayName": "ChronoPM-Project — 项目管理（日报/待办/合同）",
-  "version": "3.30.1",
+  "version": "3.30.2",
   "schemaVersion": "0.7.0",
   "supportedWorkspaceSchema": {
     "min": "0.1.0",
@@ -107,6 +107,11 @@
     "python": ">=3.9"
   },
   "versionHistory": [
+    {
+      "version": "3.30.2",
+      "date": "2026-09-21",
+      "summary": "Patch：结转快扫三问；compile 回填 3.30 主题页；做不完不得盖戳。schema保持0.17.0。双包同版本。Module 93+94（总计1011）。"
+    },
     {
       "version": "3.30.1",
       "date": "2026-09-20",
@@ -584,8 +589,8 @@
     }
   ],
   "blueprint": {
-    "lastUpdated": "2026-09-20",
-    "lastVersion": "3.30.1",
+    "lastUpdated": "2026-09-21",
+    "lastVersion": "3.30.2",
     "updateRequiredOn": [
       "major",
       "minor",

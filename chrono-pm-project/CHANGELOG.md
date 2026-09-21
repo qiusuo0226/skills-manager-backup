@@ -4,6 +4,34 @@
 
 ---
 
+## 3.30.2 — 2026-09-21
+
+> Patch。结转先快扫三问，已过只改点名人；补完 3.30 主题页存量回填，做不完不得盖戳。schema **0.17.0** 不变。双包同号。施工只认回归 **1011**。
+
+Blueprint Impact: metadata-only
+
+### Fixed
+- 22/00/23/SKILL/01/手递：查结转=快扫三问，禁止用跑脚本或完整写代理当查
+- 3.30 存量：`compile_source_digests.py` 回填 missing/old/stale 主题页；migrate 先存量后戳
+
+### Changed
+- 16 §2.1b 存量硬闸；20 §11 README 仅为当前指针
+- 19 §3.3b：戳≥3.30.2 时残留 old_digest 为健康 P0，不阻断查询
+- digest-schemas：升级执行可写页；日常仍只检测
+- Module 93+94（合计 1011）
+
+### 不做
+- 升 schema；日常 refresh 重写页；跨源 Wiki；代更 Grok；本轮写入业务仓
+
+### 收尾补记（2026-09-21，不另起版本）
+- 用户指示收尾。**升级可以投入使用。** Grok 安装区**不代更**。业务仓未代迁。schema 仍 0.17.0。
+- audit 17/17。回归 **1011**。tag `v3.30.2` / `v3.30.2-close`。AP 已删。基线 `baselines/3.30.2/`。
+- 分发包在 Downloads：`ChronoPM-Project-Skill-v3.30.2.zip`（134）+ `ChronoPM-Portfolio-Skill-v3.30.2.zip`（46）
+- README×2 发布产物已改为 v3.30.2
+- 业务仓存量：装包后各成员根跑 `compile_source_digests.py --root <成员根>`，过了再盖该工作区戳。
+
+---
+
 ## 3.30.1 — 2026-09-20
 
 > Patch。主题页过期检测补 ledger 原件指纹；无 Python 属性串写进 digest-schemas；missing_page 巡检提示不阻断；skip 比较去掉 as_of。schema **0.17.0** 不变。双包同号。施工只认回归 **997**。

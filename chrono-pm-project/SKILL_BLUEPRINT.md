@@ -20,10 +20,10 @@
 | 属性 | 值 |
 |---|---|
 | Skill 名称 | ChronoPM — Markdown 驱动的 AI 项目管理技能 |
-| 当前版本 | 3.30.1（ChronoPM-Project + ChronoPM-Portfolio 共用版本线；版本单一事实源为 `scripts/_version.py`） |
+| 当前版本 | 3.30.2（ChronoPM-Project + ChronoPM-Portfolio 共用版本线；版本单一事实源为 `scripts/_version.py`） |
 | Workspace Schema | 详见 `scripts/_version.py`（WORKSPACE_SCHEMA_VERSION） |
 | 创建日期 | 2026-08-09 |
-| 最后更新 | 2026-09-20（v3.30.1：原件指纹过期检测）；2026-09-20（v3.30.0：单源主题页）；更早见 CHANGELOG |
+| 最后更新 | 2026-09-21（v3.30.2：快扫结转 + 3.30 存量回填）；2026-09-20（v3.30.1：原件指纹过期检测）；更早见 CHANGELOG |
 | 维护方式 | 随 Skill 版本同步更新（详见 §13 Update Policy） |
 | 入口文件 | `SKILL.md` |
 | 元数据 | `skill.json` |
@@ -604,6 +604,7 @@ ChronoPM 建立在三层信任模型之上：
 | 3.26.0 | 相关性总闸+薄源；plans/_index 加速器+YAML 锚点+D43；查询缺 index 不边查边建；schema 保持 0.16.0；Module 84+85（总计 937） | CR-20260910-001～002 / upgrade-to-3.26.0.md |
 | 3.27.0 | 范围登记表+entities.relations+05推导失败门；parse_todos只读§1.1去重；migrate 0.17.0回填清零；Portfolio V-15；schema 0.16.0→0.17.0；Module 86–88（总计 961） | CR-20260910-003～005 / upgrade-to-3.27.0.md |
 | 3.28.0 | 对外拍板禁止技能黑话：底线19分段+五句自检；00拆段补词典；reply-rules对错例；待办编号除外；schema 保持 0.17.0；Module 89（总计 964） | CR-20260911-001 / upgrade-to-3.28.0.md |
+| 3.30.2 | 结转快扫三问 + compile 回填 3.30 主题页；做不完不得盖戳；schema 保持 0.17.0；Module 93+94（总计 1011） | CR-20260920-003～004 / upgrade-to-3.30.2.md |
 | 3.30.1 | 原件指纹比对 + 属性串文档 + missing_page 巡检 + as_of 不参与 skip；schema 保持 0.17.0；SW-017（总计 997） | CR-20260920-002 / upgrade-to-3.30.1.md |
 | 3.30.0 | 单源主题页（_digest 栏目页 + source_digest_status 过期检测）；schema 保持 0.17.0；Module 92（总计 996） | CR-20260920-001 / upgrade-to-3.30.0.md |
 | 3.29.0 | 投喂一次做完（底线20；投喂不问绑包、口述仍问）+ 源文档抽出图 figures/；schema 保持 0.17.0；Module 90+91（总计 980） | CR-20260913-001～002 / upgrade-to-3.29.0.md |

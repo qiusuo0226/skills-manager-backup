@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""派生视图生成器。列与指纹只读 view-spec.json。失败不留半文件。"""
+"""派生视图生成器。列与指纹只读 view-spec.json。失败不留半文件。
+
+日常 --all 只检测 source_digest_status，不重编 `_digest.md`。
+升级回填主题页用 compile_source_digests.py。
+"""
 from __future__ import annotations
 
 import argparse

@@ -147,7 +147,7 @@ python scripts/verify_todo_continuity.py --root <项目根>
 
 ### 3.3b 源文档拆解台账（v3.7.0，存在性非强制）
 
-已建 `sources/{编号}/` 时：台账缺行补行；分片目录须有 `_index.md`；parse-log 缺失作提示不阻断。存量 `_digest.md` 无 `doc_type: source-digest`（`old_digest`）**不判死**。已建源目录但缺 `_digest.md`（`missing_page`）**提示不阻断**；查询直走 atoms。
+已建 `sources/{编号}/` 时：台账缺行补行；分片目录须有 `_index.md`；parse-log 缺失作提示不阻断。工作区 `skillVersion` ≥ 3.30.2 且仍 `old_digest` / `missing_page` → **健康检查 P0**（升级未完成），**不阻断查询**（05 仍声明过期后读 atoms / 直走 atoms）。3.30.1 及以下：`old_digest` 不判死，`missing_page` 提示不阻断。
 
 ### 3.3c 范围登记表（v3.27.0）
 

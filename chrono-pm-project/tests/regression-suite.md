@@ -1583,11 +1583,39 @@
 | SW-010 | 无 atoms 就编成页 | 先拆，不空编 | negative |
 | SW-011 | 共享副本二编 | 禁止；沿用首拆；local_only 不入共享页 | regression |
 | SW-012 | 纠偏只改 digest | 失败；须改 atoms | negative |
-| SW-013 | 存量无 frontmatter 的 digest | 查询可读；不健康失败 | regression |
+| SW-013 | 存量无 frontmatter 的 digest | 查询可读（05 声明过期后读 atoms，不阻断）；skillVersion≥3.30.2 时健康检查 P0（升级未完成）；3.30.1 及以下不判死 | regression |
 | SW-014 | 会议转写 | 仍 WF-3 不编标准文档页 | regression |
 | SW-015 | P-CORRECT 改了 atoms 未重编 digest | 本轮失败，不得只标过期后继续 | negative |
 | SW-016 | 同轮投喂追加使 atoms/facts 增量 | 同轮重编 digest，否则 stale | positive |
 | SW-017 | 页头 source_fingerprint 与 ledger 列不一致 | `source_digest_status=stale` 且 `reason=source`；不得报 ok | negative |
+
+## 93. 快扫后改点名人（v3.30.2 CR-20260920-003）
+
+施工只认合计 **1003**（997+6）。阻断：NP-001、NP-002、NP-004、NP-005。ING-108/111、FE-018、PC-004、HO-004/005、ING-109 预期不变。
+
+| Case ID | Input | Expected | Type |
+|---|---|---|---|
+| NP-001 | `_index` 在、标记恰好 true、应建档文件齐；「注销给严维彬，受益所有人给朱嵩」 | 不跑 `carryover_step0.py`；不开两路完整写代理；只改点名文件+相关 WP+名单+视图；WP §8c/§4b 级联照旧；换人新编号+溯源链（22 §5）照旧 | positive |
+| NP-002 | 当天目录不在或标记不是 true | 必须全员 Step 0，再快扫，再改点名人 | positive |
+| NP-003 | 标记 true 但缺一人当天文件 | 视为未完成，先 Step 0（与 FE-018 同口径） | regression |
+| NP-004 | 两成员项目，快扫已过，只换人 | 分项目写（ING-109 不放宽）；同会话改点名文件；禁止每项目开读结转/日报代理 | positive |
+| NP-005 | 一个写任务塞两个成员项目 | 仍失败 | negative |
+| NP-006 | 为三问加载 22 全文或打开个人待办正文 | 本轮快扫失败 | negative |
+
+## 94. 升级存量闸（v3.30.2 CR-20260920-004）
+
+施工只认合计 **1011**（1003+8）。禁止沿用 997。阻断：UG-S01、UG-S02、UG-S03、UG-S06。SW-013 查询可读保持；健康检查仅戳≥3.30.2 时残留 old_digest/missing_page 为升级未完成。
+
+| Case ID | Input | Expected | Type |
+|---|---|---|---|
+| UG-S01 | upgrade-to 无存量节且本版改了页规格 | 不得开工 | negative |
+| UG-S02 | 存量未做完就改 `.skill-version.json` 或写「可以投入使用」 | 失败 | negative |
+| UG-S03 | 工作区有 `old_digest`；跑 compile | 写出 `doc_type: source-digest`；栏目在；切片索引在 | positive |
+| UG-S04 | 源无 atoms 就编译 | FAIL，不空编 | negative |
+| UG-S05 | 已 ok 的页 | 不重写 | regression |
+| UG-S06 | 日常 `refresh_views.py --all` | 仍不重编 `_digest.md` | regression |
+| UG-S07 | 编译后硬约束句 | 有 ATOM 链；已绑只写编号 | positive |
+| UG-S08 | 对集根跑 compile | 拒绝 | negative |
 
 ## 回归用例统计
 
@@ -1685,4 +1713,6 @@
 | 投喂一次做完 (90) | 11 | 6 | 5 |
 | 源文档抽出图佐证 (91) | 5 | 2 | 3 |
 | 单源主题页 (92) | 17 | 5 | 12 |
-| **合计** | **997** | **573** | **424** |
+| 快扫后改点名人 (93) | 6 | 3 | 3 |
+| 升级存量闸 (94) | 8 | 2 | 6 |
+| **合计** | **1011** | **578** | **433** |

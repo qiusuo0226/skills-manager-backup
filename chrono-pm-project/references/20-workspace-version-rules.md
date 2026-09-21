@@ -288,11 +288,13 @@ AI 检查"工作区健康吗"时优先读取本文件。
 **强制流程**：
 1. 读取工作区 `.skill-version.json` 中的 `skillVersion`
 2. 读取 Skill 包 `VERSION` 文件获取目标版本
-3. 若不一致 → 读取 `governance/migrations/README.md` 获取版本链
+3. 若不一致 → 读取 `governance/migrations/README.md` 作为**当前指针**（不是完整链）。漏登中间版时，以同目录已有 `upgrade-to-*.md` 文件名为准，按版本号取 `(当前, 目标]`。禁止因 README 仍写旧当前文件而跳过已存在的 upgrade-to，或重跑更早版本。
 4. 确定从当前版本到目标版本需要经过哪些升级文件
 5. 逐个读取并执行每个 `upgrade-to-{version}.md`
-6. 每级执行完毕后更新 `.skill-version.json` 为该级版本
+6. 该级 **存量步骤完成** 后才更新 `.skill-version.json` 为该级版本。upgrade-to 含存量节时，未过 `compile_source_digests.py`（或等价步骤）不得改 `skillVersion`，不得写「可以投入使用」。
 7. 全部执行完毕后验证工作区完整性（按升级文件"验证检查"段逐项确认）
+
+**存量完成闸（v3.30.2）**：本版及以后，若 upgrade-to 规定回填主题页，成员根必须跑 compile。仅当该工作区 `skillVersion` ≥ 3.30.2 时，残留 `old_digest` / `missing_page` 才算健康检查 P0。3.30.1 及以下仍提示不阻断。P0 不阻断 05 查询读 atoms。集根不编成员页。
 
 **禁止**：跳过中间版本直接升级（如从 1.0.0 直接跳到 2.0.0）。本规则与 §1 "AI 不得自行执行迁移"的关系：升级文件的具体执行仍需 PM 确认后启动，本节定义的是确认后的执行路径（逐级按升级文件执行，而非一把梭）。
 
