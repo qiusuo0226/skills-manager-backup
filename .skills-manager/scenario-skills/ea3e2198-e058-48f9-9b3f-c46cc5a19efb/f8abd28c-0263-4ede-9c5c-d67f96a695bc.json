@@ -6,9 +6,9 @@
   "tools": {
     "claude_code": true,
     "github_copilot": true,
-    "grok": false,
+    "grok": true,
     "opencode": true,
-    "qoder": false,
-    "trae_cn": false
+    "qoder": true,
+    "trae_cn": true
   }
 }
