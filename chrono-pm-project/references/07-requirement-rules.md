@@ -281,6 +281,8 @@ updated         : 时间戳
 > **kind 落盘（v3.6.0）**：需求类（requirement / requirement_directive / agreement / constraint）写入 `requirements/sources/{编号}/atoms.md`，走 ATOM→Canonical→REQ。非需求类（background / baseline / hardware / spec / term / milestone_fact）写入同目录 `facts.md`，**不进** Canonical / scope_scope。旧 4 类 kind 全部兼容，不强制重标。监理/验收中的服务承诺/质保条款：kind=agreement/constraint，source_type 归 operational（Q10）。
 >
 > **上提到来源指针**：产 REQ 时把 `source_doc` + `source_ref`（章节/条款 + 页码）写入需求清单「来源指针」，不得只把页码留在 ATOM。
+>
+> **升级补链（v3.30.3）**：`enforce_workspace_upgrade.py` 只给已经存在的需求补来源指针和文档链接，编号必须能从登记册、拆解条目或完全相同的标题确定。不新建需求，不新建工作包，不改范围结论。对不上的记入升级缺口，不得因此改版本号。
 
 ### 8.5 Canonical 字段
 

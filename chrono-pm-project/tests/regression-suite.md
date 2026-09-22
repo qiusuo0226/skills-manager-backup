@@ -1612,10 +1612,34 @@
 | UG-S02 | 存量未做完就改 `.skill-version.json` 或写「可以投入使用」 | 失败 | negative |
 | UG-S03 | 工作区有 `old_digest`；跑 compile | 写出 `doc_type: source-digest`；栏目在；切片索引在 | positive |
 | UG-S04 | 源无 atoms 就编译 | FAIL，不空编 | negative |
-| UG-S05 | 已 ok 的页 | 不重写 | regression |
+| UG-S05 | 页头合格且已绑已串完 | 不重写整页；已绑仍是占位则只改已绑 | regression |
 | UG-S06 | 日常 `refresh_views.py --all` | 仍不重编 `_digest.md` | regression |
 | UG-S07 | 编译后硬约束句 | 有 ATOM 链；已绑只写编号 | positive |
 | UG-S08 | 对集根跑 compile | 拒绝 | negative |
+
+## 95. 升级执行程序强制（v3.30.3 CR-20260922-001）
+
+施工只认合计 **1028**（1011+17）。禁止沿用 1011。已拆标准文件未串完不得改 skillVersion。日常 refresh 仍不重写主题页。
+
+| Case ID | Input | Expected | Type |
+|---|---|---|---|
+| UE-001 | 登记册已有该源的需求编号和工作包 | 已绑写上这两个编号；退出码 0 | positive |
+| UE-002 | 源还没有拆解条目，登记里也没有编号 | 已绑为 `无登记边`；不出现新编号 | positive |
+| UE-003 | 已绑里有登记册不存在的编号 | 退出码非 0；版本号不变 | negative |
+| UE-004 | 页头合格，已绑仍是占位，且链没串完 | 不得把写出 0 页当成功；版本号不变 | negative |
+| UE-005 | 工作区版本已等于技能版本，已绑仍空 | 仍补写已绑 | positive |
+| UE-006 | 版本相同且已绑已与登记一致 | 文件内容不变 | regression |
+| UE-007 | 工作区版本高于技能版本 | 不写页、不改版本号 | negative |
+| UE-008 | 临时联邦根下两个成员根 | 集根不编页；两个成员各跑同一套 | regression |
+| UE-009 | 缺页且没有拆解条目 | 退出码非 0；不写空页 | negative |
+| UE-010 | 链未串完就请求盖戳 | 版本号不变 | negative |
+| UE-011 | 走原升到 3.0.0 的分支 | 闸未过不能写 skillVersion | regression |
+| UE-012 | 项目没有 requirements/sources/ | 这一步通过 | positive |
+| UE-013 | 当前目录不是 ChronoPM 工作区 | 退出码 0；目录无改动 | positive |
+| UE-014 | refresh_views.py --all | 不改 _digest.md | regression |
+| UE-015 | 两份已拆源标题完全一致，其中一份已挂需求和工包 | 另一份写入同一来源指针和文档链接；已绑含工包和对方编号 | positive |
+| UE-016 | 已拆源对不上需求，或有需求但没有工包 | 写入迁移日志和待裁定；退出码非 0；版本号不变 | negative |
+| UE-017 | 脚本跑完 | 不出现 ai/wiki/；主题页不出现 [[ | negative |
 
 ## 回归用例统计
 
@@ -1715,4 +1739,5 @@
 | 单源主题页 (92) | 17 | 5 | 12 |
 | 快扫后改点名人 (93) | 6 | 3 | 3 |
 | 升级存量闸 (94) | 8 | 2 | 6 |
-| **合计** | **1011** | **578** | **433** |
+| 升级执行程序强制 (95) | 17 | 6 | 11 |
+| **合计** | **1028** | **584** | **444** |

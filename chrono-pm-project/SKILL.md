@@ -1,8 +1,8 @@
 ---
 name: chrono-pm-project
-version: 3.30.2
+version: 3.30.3
 schema_version: 0.17.0
-updated_at: 2026-09-21
+updated_at: 2026-09-22
 description: 给项目经理的单项目 AI 项目管理技能。把日报、待办、工作包、计划、合同、风险、会议纪要写进本项目 ai 目录。触发：项目管理、项目、单项目、初始化项目、工作包、WP、计划、看计划、排计划、倒排、排期、阶段、里程碑、门禁、结转、派活、待办、任务、进度、需求、变更、范围、合同、合同登记、风险、问题、决策、会议、会议纪要、纪要、拆文件、源文档、工时、能耗、人员、花名册、人员进出、进度表、xlsx、csv、投喂、粘贴、入库、归档、更新、补全、回填、评审、验收、成本、预算、复盘、历史计划、完整性巡检、词库、偏好、画图、责任链图、记日报、日报、出周报、周报、ChronoPM、ChronoPM-Project、ChronoPM-Portfolio。项目集、组合、跨项目汇总请安装并调用 ChronoPM-Portfolio。本包只写本项目。
 ---
 # ChronoPM-Project — 项目管理（日报/待办/合同）
@@ -85,7 +85,7 @@ python "scripts/init_workspace.py" --project-root <根目录> --mode single --pr
 ```
 无 `--mode portfolio`。向导见 `18-init-wizard-rules.md`（含成本核算方式必填）。
 ### 5.1b 版本检查（进入工作区先做）
-读 `ai/.skill-version.json` → 比 Skill `VERSION`。Skill < 工作区版本 → 提示升级 Skill + 只读降级。见 `20-workspace-version-rules.md`。
+读 `ai/.skill-version.json` → 比 Skill `VERSION`。Skill < 工作区版本 → 提示升级 Skill + 只读降级。见 `20-workspace-version-rules.md`。会话钩子会自己运行 `scripts/enforce_workspace_upgrade.py`：技能更新或已拆标准文件还没串完时由程序处理。模型禁止改 `.skill-version.json` 的 `skillVersion`，禁止把没串完说成升级完成。钩子没跑成时，版本号保持原样。
 随后 **P-VIEWS**：有 Python 则跑本 Skill 包 `scripts/refresh_views.py --project-root <根> --all`（与 SKILL.md 同级；指纹未变不写盘）。`<根>` = **单项目根**（其下直接有 `ai/wps/`）。联邦集工作区须指向成员项目根 `.../ai/projects/{项目名}`，**禁止**对集根或 `.../ai`（只有 `portfolio/`+`projects/`）跑 `--all`，否则会写出空视图。无 Python / 无 `.state.json` / 脚本失败 → 不阻断；查询读事实原文并声明 as-of。缺 `context/brain.md` 不致命。
 ### 5.2 日报
 先判定是否本项目 → 原文进 inbox → 合并进当天一人一份个人文件 → 映射待办（够正式的未匹配进展自动建待办）。禁止写入 `reports/daily/`。明日计划留在当天原文，次日才落待办。疑似他项目：拆分+分流，禁代写。见 `01-daily-report-rules.md`。
@@ -204,7 +204,7 @@ python "scripts/init_workspace.py" --project-root <根目录> --mode single --pr
 ### 版本控制文件
 | 文件 | 用途 |
 |------|------|
-| `VERSION` | Skill 包版本号（当前 3.30.2） |
+| `VERSION` | Skill 包版本号（当前 3.30.3） |
 | `skill.json` | Skill 元数据（版本、模式、依赖；skill schemaVersion 与 supportedWorkspaceSchema 分离） |
 | `CHANGELOG.md` | 版本变更历史和升级说明 |
 | SKILL.md front matter | AI 可读的版本字段 |

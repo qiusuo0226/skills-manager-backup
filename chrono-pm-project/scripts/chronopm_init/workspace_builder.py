@@ -124,8 +124,12 @@ def create_single_project(project_root: str, project_name: str = ""):
     print("\n创建版本文件...")
     create_skill_version(ai_dir, "single")
     create_migration_log(ai_dir)
+    from enforce_workspace_upgrade import install_project_hook
+
+    install_project_hook(Path(project_root))
     print("  create .skill-version.json")
     print("  create logs/migration-log.md")
+    print("  create .grok/hooks/chronopm-upgrade.json")
 
     # 11. 创建 README.md
     print("\n创建 README.md...")

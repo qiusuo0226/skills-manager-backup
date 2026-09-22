@@ -1,7 +1,7 @@
 {
   "name": "chrono-pm-portfolio",
   "displayName": "ChronoPM-Portfolio — 跨项目归集（须先装 Project）",
-  "version": "3.30.2",
+  "version": "3.30.3",
   "schemaVersion": "0.7.0",
   "supportedWorkspaceSchema": {
     "min": "0.9.0",
@@ -18,6 +18,11 @@
     "python": ">=3.9"
   },
   "versionHistory": [
+    {
+      "version": "3.30.3",
+      "date": "2026-09-22",
+      "summary": "锁步3.30.3。联邦根按成员根跑升级程序。集层不编页。schema保持0.17.0。回归1028。"
+    },
     {
       "version": "3.30.2",
       "date": "2026-09-21",
@@ -205,7 +210,7 @@
     }
   ],
   "blueprint": {
-    "lastUpdated": "2026-09-21",
-    "lastVersion": "3.30.2"
+    "lastUpdated": "2026-09-22",
+    "lastVersion": "3.30.3"
   }
 }

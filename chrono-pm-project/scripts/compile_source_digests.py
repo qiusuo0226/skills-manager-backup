@@ -171,6 +171,310 @@ def _build_page(src_dir: Path, sid: str) -> str:
     return text
 
 
+REQ_RE = re.compile(r"\bREQ-[A-Za-z0-9._-]+\b")
+WP_RE = re.compile(r"\bWP-[A-Za-z0-9._-]+\b")
+_EMPTY = {"", "—", "-", "–", "本源未见"}
+
+
+def _read(path: Path) -> str:
+    try:
+        return path.read_text(encoding="utf-8")
+    except OSError:
+        return ""
+
+
+def _title(src_dir: Path) -> str:
+    for name in ("meta.md", "_digest.md"):
+        for line in _read(src_dir / name).splitlines():
+            if not line.startswith("# "):
+                continue
+            rest = line[2:].strip()
+            if "—" in rest:
+                return rest.split("—", 1)[1].strip()
+            if " - " in rest:
+                return rest.split(" - ", 1)[1].strip()
+            return rest
+    return ""
+
+
+def _source_refs(src_dir: Path) -> list[str]:
+    refs: list[str] = []
+    files = []
+    atoms = src_dir / "atoms.md"
+    if atoms.is_file():
+        files.append(atoms)
+    ad = src_dir / "atoms"
+    if ad.is_dir():
+        files.extend(sorted(p for p in ad.glob("**/*.md") if p.is_file()))
+    for p in files:
+        for line in _read(p).splitlines():
+            if "source_ref" not in line or ":" not in line:
+                continue
+            val = line.split(":", 1)[1].strip()
+            if val not in _EMPTY and val not in refs:
+                refs.append(val)
+    return refs
+
+
+def _atom_ids_in(src_dir: Path) -> list[str]:
+    return _atom_ids(src_dir)
+
+
+def _table_rows(text: str) -> tuple[list[str], list[list[str]]]:
+    lines = text.splitlines()
+    headers: list[str] = []
+    start = None
+    for i, line in enumerate(lines):
+        if not line.startswith("|"):
+            continue
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if any("来源" in c for c in cells) and any("Req" in c or "需求" in c for c in cells):
+            headers = cells
+            start = i
+            break
+    if start is None:
+        return [], []
+    rows = []
+    for line in lines[start + 1 :]:
+        if not line.startswith("|"):
+            break
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if set(cells) <= {"---", ":---", "---:", ":---:"} or all(set(c) <= {"-", ":"} for c in cells):
+            continue
+        rows.append(cells)
+    return headers, rows
+
+
+def _col(headers: list[str], *names: str) -> int:
+    for i, h in enumerate(headers):
+        if any(n in h for n in names):
+            return i
+    return -1
+
+
+def _section2(text: str) -> str:
+    grab = False
+    buf: list[str] = []
+    for line in text.splitlines():
+        if line.startswith("## 2"):
+            grab = True
+            continue
+        if grab and line.startswith("## "):
+            break
+        if grab:
+            buf.append(line)
+    return "\n".join(buf)
+
+
+def _wp_ids_for(ai: Path, sid: str, req_ids: set[str], register_text: str) -> list[str]:
+    found: set[str] = set()
+    headers, rows = _table_rows(register_text)
+    req_i = _col(headers, "Req", "需求编号")
+    wp_i = _col(headers, "工作包")
+    if req_i >= 0 and wp_i >= 0:
+        for row in rows:
+            if req_i >= len(row):
+                continue
+            if row[req_i] not in req_ids:
+                continue
+            cell = row[wp_i] if wp_i < len(row) else ""
+            found.update(WP_RE.findall(cell))
+    wps = ai / "wps"
+    if wps.is_dir():
+        for wp in sorted(wps.glob("WP-*.md")):
+            body = _section2(_read(wp))
+            if f"sources/{sid}" in body or any(r in body for r in req_ids):
+                found.add(wp.stem)
+    return sorted(found)
+
+
+def _direct_reqs(register_text: str, sid: str, atom_ids: list[str]) -> set[str]:
+    found: set[str] = set()
+    headers, rows = _table_rows(register_text)
+    req_i = _col(headers, "Req", "需求编号")
+    src_i = _col(headers, "来源")
+    if req_i >= 0 and src_i >= 0:
+        for row in rows:
+            if max(req_i, src_i) >= len(row):
+                continue
+            src = row[src_i]
+            if f"sources/{sid}" in src or f"/{sid}" in src:
+                if REQ_RE.fullmatch(row[req_i]) or row[req_i].startswith("REQ-"):
+                    found.add(row[req_i])
+    if atom_ids:
+        lines = register_text.splitlines()
+        last_req = ""
+        for line in lines:
+            ids = REQ_RE.findall(line)
+            if ids:
+                last_req = ids[-1]
+            if last_req and any(a in line for a in atom_ids):
+                found.add(last_req)
+    return found
+
+
+def _append_unique(path: Path, line: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    old = _read(path) if path.is_file() else ""
+    if line in old:
+        return
+    text = old
+    if text and not text.endswith("\n"):
+        text += "\n"
+    if path.name == "migration-log.md" and "## wiki 缺口" not in text:
+        text += "\n## wiki 缺口\n\n"
+    if path.name == "pm-decisions.md" and "## 升级待裁定" not in text:
+        text += "\n## 升级待裁定\n\n"
+    text += line + "\n"
+    path.write_text(text, encoding="utf-8")
+
+
+def _set_bind(text: str, body: list[str]) -> str:
+    lines = text.splitlines()
+    out: list[str] = []
+    i = 0
+    found = False
+    while i < len(lines):
+        if lines[i].startswith("## ") and "已绑" in lines[i]:
+            found = True
+            out.append(lines[i])
+            out.append("")
+            out.extend(body)
+            out.append("")
+            i += 1
+            while i < len(lines) and not (lines[i].startswith("## ") and "已绑" not in lines[i]):
+                if lines[i].startswith("## ") and "已绑" not in lines[i]:
+                    break
+                i += 1
+            continue
+        out.append(lines[i])
+        i += 1
+    if not found:
+        if out and out[-1] != "":
+            out.append("")
+        out.extend(["## 已绑", ""] + body)
+    return "\n".join(out).rstrip() + "\n"
+
+
+def _bind_body(req_ids: list[str], wp_ids: list[str], siblings: list[str]) -> list[str]:
+    body = [" / ".join(req_ids + wp_ids)]
+    if siblings:
+        body.append("同链源 " + " ".join(siblings))
+    return body
+
+
+def _ensure_pointer(text: str, sid: str, ref: str, req_id: str) -> str:
+    pointer = f"sources/{sid} {ref}".strip()
+    doc = f"requirements/sources/{sid}/"
+    headers, _rows = _table_rows(text)
+    src_i = _col(headers, "来源")
+    lines = text.splitlines()
+    if src_i >= 0:
+        for i, line in enumerate(lines):
+            if not line.startswith("|") or req_id not in line:
+                continue
+            cells = [c.strip() for c in line.strip().strip("|").split("|")]
+            if src_i < len(cells) and f"sources/{sid}" not in cells[src_i]:
+                cells[src_i] = (cells[src_i] + "；" + pointer).strip("；")
+                lines[i] = "| " + " | ".join(cells) + " |"
+                break
+    text = "\n".join(lines)
+    if doc not in text:
+        text = text.rstrip() + (
+            f"\n\n### 升级补链 {req_id}\n\n"
+            f"- 来源指针：{pointer}\n"
+            f"- 原型/文档链接：{doc}\n"
+        )
+    elif f"sources/{sid}" not in text:
+        text = text.rstrip() + f"\n- 来源指针：{pointer}\n"
+    return text if text.endswith("\n") else text + "\n"
+
+
+def _apply_wiki(ai: Path, write: bool = True) -> int:
+    """已拆标准文件串成链。写不出则记缺口并返回失败数。没拆过的源只把已绑写成无登记边或已有编号。"""
+    sources = ai / "requirements" / "sources"
+    if not sources.is_dir():
+        return 0
+    register = ai / "requirements" / "requirement-register.md"
+    reg_text = _read(register)
+    dirs = [p for p in sorted(sources.iterdir()) if p.is_dir()]
+    split = [d for d in dirs if _has_atoms(d)]
+    direct: dict[str, set[str]] = {}
+    refs: dict[str, list[str]] = {}
+    for d in split:
+        sid = d.name
+        refs[sid] = _source_refs(d)
+        direct[sid] = _direct_reqs(reg_text, sid, _atom_ids_in(d))
+    chosen: dict[str, str] = {}
+    gaps: list[tuple[str, str]] = []
+    for d in split:
+        sid = d.name
+        if not refs[sid]:
+            gaps.append((sid, "切片没有章节或页码"))
+            continue
+        cands = direct[sid]
+        if len(cands) > 1:
+            gaps.append((sid, "同时对上好几条需求"))
+            continue
+        if len(cands) == 1:
+            chosen[sid] = next(iter(cands))
+            continue
+        title = _title(d)
+        titled = {
+            next(iter(direct[other.name]))
+            for other in split
+            if other.name != sid and _title(other) == title and title and len(direct[other.name]) == 1
+        }
+        if len(titled) == 1:
+            chosen[sid] = next(iter(titled))
+        elif len(titled) > 1:
+            gaps.append((sid, "同时对上好几条需求"))
+        else:
+            gaps.append((sid, "没有可确定的需求"))
+    wp_of: dict[str, list[str]] = {}
+    for sid, req in list(chosen.items()):
+        wps = _wp_ids_for(ai, sid, {req}, reg_text)
+        if not wps:
+            gaps.append((sid, "没有工作包"))
+            del chosen[sid]
+            continue
+        wp_of[sid] = wps
+    by_req: dict[str, list[str]] = {}
+    for sid, req in chosen.items():
+        by_req.setdefault(req, []).append(sid)
+    if write and register.is_file() and chosen:
+        text = reg_text
+        for sid, req in chosen.items():
+            text = _ensure_pointer(text, sid, refs[sid][0], req)
+        if text != reg_text:
+            register.write_text(text, encoding="utf-8")
+    gapped = {sid for sid, _reason in gaps}
+    for d in dirs:
+        sid = d.name
+        digest = d / "_digest.md"
+        if not digest.is_file():
+            continue
+        if sid in gapped:
+            continue
+        if sid in chosen:
+            siblings = sorted(s for s in by_req[chosen[sid]] if s != sid)
+            body = _bind_body([chosen[sid]], wp_of[sid], siblings)
+        else:
+            ids = sorted(set(_direct_reqs(reg_text, sid, []) ) | set(_wp_ids_for(ai, sid, set(), reg_text)))
+            body = [" / ".join(ids)] if ids else ["无登记边"]
+        old = _read(digest)
+        new = _set_bind(old, body)
+        if write and new != old:
+            digest.write_text(new, encoding="utf-8")
+    for sid, reason in gaps:
+        line = f"- {sid}：{reason}"
+        if write:
+            _append_unique(ai / "logs" / "migration-log.md", line)
+            _append_unique(ai / "pm-decisions.md", line)
+        print(f"GAP {sid} {reason}")
+    return len(gaps)
+
+
 def compile_workspace(root: str, dry_run: bool = False, check_only: bool = False) -> int:
     project = Path(root).resolve()
     ai = _ai(project)
@@ -231,6 +535,7 @@ def compile_workspace(root: str, dry_run: bool = False, check_only: bool = False
             if _has_atoms(src):
                 print(f"FAIL still {rec.get('status')} {src.name}")
                 failed += 1
+    failed += _apply_wiki(ai, write=not dry_run and not check_only)
     print(f"done wrote={wrote} skip={skipped} fail={failed}")
     return 1 if failed else 0
 

@@ -1176,6 +1176,14 @@ def refresh_views_force(project_root: Path) -> None:
     )
 
 
+def stamp_skill_version(ai_dir: Path, mode: str, skill_version: str = None, gates_passed: bool = False):
+    """唯一允许写入 skillVersion 的入口。闸未过则不写文件。"""
+    if not gates_passed:
+        print("  闸未过，不改 skillVersion")
+        return None
+    return update_version_file(ai_dir, mode, skill_version)
+
+
 def update_version_file(ai_dir: Path, mode: str, skill_version: str = None):
     """更新 .skill-version.json
 
@@ -2260,22 +2268,20 @@ def migrate_workspace(project_root: str, dry_run: bool = False, target_version: 
     if needs_v300:
         print(f"\n{'='*40}")
         print("v3.0.0：工作区结构迁移见 governance/migrations/upgrade-to-3.0.0.md 节 B")
-        print("本次脚本不自动拆工作区、不下沉子项目。仅更新 .skill-version.json 元数据。")
+        print("本次脚本不自动拆工作区、不下沉子项目。版本号等到存量闸和 wiki 闸通过后再写。")
         print(f"{'='*40}")
         sv = ai_dir / ".skill-version.json"
         if sv.exists() and not dry_run:
             try:
                 data = json.loads(sv.read_text(encoding="utf-8"))
-                data["skillVersion"] = CURRENT_SKILL_VERSION
-                data["schemaVersion"] = CURRENT_SCHEMA_VERSION
                 if data.get("skillName") in (None, "", "chrono-pm"):
                     data["skillName"] = "chrono-pm-project"
-                sv.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-                print("  已更新 .skill-version.json（skillName=chrono-pm-project, 3.0.0 / schema 0.9.0）")
+                    sv.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+                    print("  已把 skillName 改为 chrono-pm-project；skillVersion 仍待闸通过")
             except Exception as e:
-                print(f"  ⚠️ 未能改写 .skill-version.json: {e}")
+                print(f"  ⚠️ 未能改写 skillName: {e}")
         elif dry_run:
-            print("  [dry-run] 将更新 .skill-version.json skillVersion/schemaVersion/skillName")
+            print("  [dry-run] 闸通过后才更新 skillVersion")
 
     # 4d. v3.5.0：建 wps/ + 打印一次性抽取入口（不自动删计划内嵌表）
     needs_v350 = _vcmp(skill_version, "3.5.0") >= 0 and (
@@ -2369,7 +2375,7 @@ def migrate_workspace(project_root: str, dry_run: bool = False, target_version: 
         print(f"\n✅ 目录和文件已完整，先存量再更新版本号")
         if not ensure_stock_compiled(ai_dir, dry_run=False):
             return
-        old_version = update_version_file(ai_dir, mode, skill_version)
+        old_version = stamp_skill_version(ai_dir, mode, skill_version, gates_passed=True)
         append_migration_log(ai_dir, old_version, [], [], skill_version)
         print(f"\n✅ 版本已更新到 {skill_version}")
         migrate_business_data(ai_dir, dry_run=not migrate_business)
@@ -2411,7 +2417,7 @@ def migrate_workspace(project_root: str, dry_run: bool = False, target_version: 
     if not ensure_stock_compiled(ai_dir, dry_run=False):
         return
     print(f"\n更新版本号...")
-    old_version = update_version_file(ai_dir, mode, skill_version)
+    old_version = stamp_skill_version(ai_dir, mode, skill_version, gates_passed=True)
     print(f"  ✓ {old_version} → {skill_version}")
 
     # 记录迁移日志

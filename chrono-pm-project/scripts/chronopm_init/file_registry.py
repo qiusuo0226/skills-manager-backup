@@ -102,23 +102,19 @@ batch_id: YYYYMMDDHHMMSS
 
 
 def create_skill_version(ai_dir: Path, mode: str):
-    """在工作区根目录生成 .skill-version.json"""
+    """新建工作区的版本文件。skillVersion 只经 stamp_skill_version 写入。"""
     version_path = ai_dir / ".skill-version.json"
     if version_path.exists():
         return
+    from migrate_workspace import stamp_skill_version
 
-    metadata = {
-        "skill": "chrono-pm-project",
-        "skillVersion": SKILL_VERSION,
-        "workspaceSchemaVersion": WORKSPACE_SCHEMA_VERSION,
-        "mode": mode,
-        "initializedAt": datetime.now().strftime("%Y-%m-%dT%H:%M:%S+08:00"),
-        "lastMigratedAt": None
-    }
-    version_path.write_text(
-        json.dumps(metadata, indent=2, ensure_ascii=False),
-        encoding="utf-8"
-    )
+    stamp_skill_version(ai_dir, mode, gates_passed=True)
+    if not version_path.is_file():
+        return
+    data = json.loads(version_path.read_text(encoding="utf-8"))
+    data["skill"] = "chrono-pm-project"
+    data["lastMigratedAt"] = None
+    version_path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
 
 def create_migration_log(ai_dir: Path):

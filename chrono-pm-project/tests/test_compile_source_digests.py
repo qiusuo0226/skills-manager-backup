@@ -17,7 +17,22 @@ def _write(p: Path, text: str) -> None:
 def _src(root: Path, sid: str = "SRC-001", digest="old") -> Path:
     d = root / "ai" / "requirements" / "sources" / sid
     d.mkdir(parents=True, exist_ok=True)
-    _write(d / "atoms.md", "ATOM-1 必须满足条款甲\n")
+    _write(d / "atoms.md", "ATOM-1 必须满足条款甲\n- source_ref: 第1章\n")
+    _write(
+        root / "ai" / "requirements" / "requirement-register.md",
+        "\n".join(
+            [
+                "| Req ID | 标题 | 确认状态 | 生命周期 | 工作包 | 来源 | 优先级 |",
+                "|---|---|---|---|---|---|---|",
+                f"| REQ-1 | 甲 | 已确认 | 进行中 | WP-1 | sources/{sid} | Must |",
+                "",
+            ]
+        ),
+    )
+    _write(
+        root / "ai" / "wps" / "WP-1.md",
+        f"# WP-1\n\n## 2. 关联需求\n\n| 需求编号 | 来源路径 |\n|---|---|\n| REQ-1 | requirements/sources/{sid}/ |\n",
+    )
     _write(
         d / "ledger.md",
         "| source_id | file | file_type | size_kb | source_fingerprint | file_created | source_version | description | parse_history |\n"

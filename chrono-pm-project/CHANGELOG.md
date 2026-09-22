@@ -4,6 +4,31 @@
 
 ---
 
+## 3.30.3 — 2026-09-22
+
+> Patch。升级改由程序执行。已拆标准文件要串成来源指针、文档链接和工作包编号，串不完不得盖戳。schema **0.17.0** 不变。双包同号。施工只认回归 **1028**。
+
+Blueprint Impact: metadata-only
+
+### Fixed
+- 页头合格不再当成升级完成。已拆源未串完时退出码非 0，不改 skillVersion
+- 迁移脚本不再在存量闸之前写 skillVersion
+
+### Changed
+- 新增 `enforce_workspace_upgrade.py` 与会话钩子。超时 120 秒
+- 16 §2.1b、20、07、digest-schemas、SKILL §5.1b、Portfolio 06
+- Module 95（合计 1028）
+
+### 不做
+- 升 schema；新建 `ai/wiki/`；新造需求或工作包；日常 refresh 重写主题页；代更 Grok；本轮写入业务仓
+
+### 收尾补记（2026-09-22，不另起版本）
+- 用户指示收尾。**升级可以投入使用。** Grok 安装区**不代更**。业务仓未代迁。schema 仍 0.17.0。
+- audit 17/17。回归 **1028**。tag `v3.30.3`。基线 `baselines/3.30.3/`。
+- 分发包在 Downloads：`ChronoPM-Project-Skill-v3.30.3.zip`（136）+ `ChronoPM-Portfolio-Skill-v3.30.3.zip`（46）。README 发布产物已改为 v3.30.3。
+
+---
+
 ## 3.30.2 — 2026-09-21
 
 > Patch。结转先快扫三问，已过只改点名人；补完 3.30 主题页存量回填，做不完不得盖戳。schema **0.17.0** 不变。双包同号。施工只认回归 **1011**。
