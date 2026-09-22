@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "skill_id": "f6eb1bb6-437e-4350-b740-3f49d3201553",
+  "path": "chainlinker-fe-sync-dev-to-prod",
+  "path_key": "chainlinker-fe-sync-dev-to-prod",
+  "enabled": true,
+  "tags": [],
+  "source": {
+    "type": "local",
+    "ref": null,
+    "subpath": null,
+    "branch": null
+  }
+}
