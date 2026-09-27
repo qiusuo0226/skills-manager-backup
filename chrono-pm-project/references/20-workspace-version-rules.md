@@ -26,7 +26,7 @@ AI 在进入任何工作区的处理流程前，**必须先读取 `ai/.skill-ver
 
 **双层 `.skill-version.json`：**
 - **项目级**（`ai/.skill-version.json`）管本项目 ai，读写以本文件为准。
-- **集级**（联邦工作区根级，若存在）管整体挂载健康，由 ChronoPM-Portfolio 读取。
+- **集级**（联邦工作区根级，若存在）管整体挂载健康，由本包 `portfolio-skill/` 读取。
 - 各自生效：**集级只读降级不蔓延进项目内正常单项目操作**。本包在项目 ai 内按项目级文件判断。
 - `skillName`：`chrono-pm` 与 `chrono-pm-project` 视为同一 Project 包，兼容识别。
 

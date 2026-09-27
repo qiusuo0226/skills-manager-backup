@@ -332,17 +332,17 @@ PM 方法论、干系人沟通备忘、项目洞察、交付策略等**低结构
 
 ### 8.9 合同作用域与检索路由（CR-20260813-002）
 
-RI 范围判定隐含"合同↔项目 1:1"假设，但现实中为**多对多**（联合体合同、跨项目合同、主合同+多补充协议、同一项目被多份合同覆盖等）。本小节补齐该缺口：项目级 contract-register 作为拆解发生地，定义 ATOM/Canonical 的存储归属、带合同维度的 scope 判定与检索路由。跨项目检索由 ChronoPM-Portfolio 执行。
+RI 范围判定隐含"合同↔项目 1:1"假设，但现实中为**多对多**（联合体合同、跨项目合同、主合同+多补充协议、同一项目被多份合同覆盖等）。本小节补齐该缺口：项目级 contract-register 作为拆解发生地，定义 ATOM/Canonical 的存储归属、带合同维度的 scope 判定与检索路由。跨项目检索由本包 `portfolio-skill/` 执行。
 
 #### 8.9.1 contract-register.md 合同登记册（拆解发生地）
 
-**位置**：项目级 `requirements/contract-register.md` 为合同登记与检索入口（每项目一份）。集层 P-HANDOFF-ACCEPT 可 CALL 本节写该项目登记册；禁止 Portfolio 另写格式；空则补录引导不臆造。**拆解产物（v3.6.0）**落 `requirements/sources/{编号}/`（一个源文档 = 一个目录，编号即目录名）。文档簇固定号（CON-/BID-/INIT-/COMP-/SUP-/TRN- 等 `{YYYYMMDD}-{HHmmss}`）为跨项目互认键；`SRC-NNN` 仅项目内短号，不得作互认键。
+**位置**：项目级 `requirements/contract-register.md` 为合同登记与检索入口（每项目一份）。集层 P-HANDOFF-ACCEPT 可 CALL 本节写该项目登记册；禁止 `portfolio-skill/` 另写格式；空则补录引导不臆造。**拆解产物（v3.6.0）**落 `requirements/sources/{编号}/`（一个源文档 = 一个目录，编号即目录名）。文档簇固定号（CON-/BID-/INIT-/COMP-/SUP-/TRN- 等 `{YYYYMMDD}-{HHmmss}`）为跨项目互认键；`SRC-NNN` 仅项目内短号，不得作互认键。
 
 - **现行**：`requirements/sources/{CON-… 或 SRC-NNN}/` 含 meta.md / _digest.md（单源主题页，派生，禁止把页正文抄进 REQ） / atoms.md（或 atoms/）/ facts.md（或 facts/）/ ledger.md / parse-log.md。
-- **存量**：旧 `{type}-source/` 走零清重建，不走迁移；未零清前禁止新拆解。禁止再新建 `{type}-source/`。Portfolio V-8 读取端仍可兼容旧形态。
+- **存量**：旧 `{type}-source/` 走零清重建，不走迁移；未零清前禁止新拆解。禁止再新建 `{type}-source/`。`portfolio-skill/` 的 V-8 读取端仍可兼容旧形态。
 - **禁止第三套目录**（不得再使用 `contracts/CON-NNN` 等旧目录名，也不得在 sources/ 与 {type}-source/ 之外再造一套）。
 
-跨项目检索由 ChronoPM-Portfolio 遍历 + 指纹去重，本包不维护集层登记册、不「项目集唯一登记册、子项目不复制」。
+跨项目检索由本包 `portfolio-skill/` 遍历 + 指纹去重，本包不维护集层登记册、不「项目集唯一登记册、子项目不复制」。
 
 **字段**：
 
@@ -375,7 +375,7 @@ RI 范围判定隐含"合同↔项目 1:1"假设，但现实中为**多对多**�
 
 **Canonical storage_level 判定**：Canonical 是跨源归并产物，一律落项目级：
 - evidence 全部来自本项目合同 → 归本项目；
-- evidence 跨项目 → 各覆盖项目各存一份副本（同源复制，禁止二次拆解），`storage_level` 可标 `portfolio` 语义但**存储不在集层**；跨项目检索由 ChronoPM-Portfolio 做。
+- evidence 跨项目 → 各覆盖项目各存一份副本（同源复制，禁止二次拆解），`storage_level` 可标 `portfolio` 语义但**存储不在集层**；跨项目检索由本包 `portfolio-skill/` 做。
 - 多合同覆盖本项目时 Canonical 归 `requirements/canonical/`，用 `contract_refs` 区分合同。
 
 **contract_refs 伴随字段（D1）**：Canonical 层新增 `contract_refs`（关联合同 ID 列表），表达"在哪些合同范围内"。scope_scope 保持既有 5 值枚举不变（向后兼容），`contract_refs` 为伴随字段。旧 Canonical 无该字段 → 视为"未关联合同"降级标注，不报错。
@@ -386,7 +386,7 @@ RI 范围判定隐含"合同↔项目 1:1"假设，但现实中为**多对多**�
 Step 0  读本项目 requirements/contract-register.md（空 → 触发补录引导，最小字段：ID/名称/scope_level/覆盖/status）
 Step 1  解析合同指向
         ├─ 指定合同（CON-XXX/名称）→ 查本项目 requirements/canonical
-        │     scope_level=portfolio 语义 → 本项目副本 + 提示跨项目检索用 ChronoPM-Portfolio
+        │     scope_level=portfolio 语义 → 本项目副本 + 跨项目检索由本包 `portfolio-skill/` 承载
         │     scope_level=supplement → 经 parent_contract_id 回溯父合同后仍在本项目路由
         ├─ 未指定 → 列本项目合同候选供选择；或"全部范围"→ 逐合同检索合并
         └─ 登记册空/无匹配 → 提示补录，不臆造（D5）

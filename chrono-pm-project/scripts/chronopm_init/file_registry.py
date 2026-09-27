@@ -9,7 +9,7 @@ v2.0.0 待办体系重构：迭代登记册函数删除（PLAN 文件由 AI 按�
 内嵌文案中的 board/里程碑板/旧索引路径全部替换为新体系路径。
 
 v3.0.0（P-14/P-30）：portfolio 初始化分支已删除——init 仅产单项目工作区，
-集工作区归 ChronoPM-Portfolio 伴生包（无 init 脚本）。本文件中
+集工作区归本包 portfolio-skill/（无独立 init）。本文件中
 is_portfolio 渲染分支、generate_portfolio_readme、集层目标目录分支均随
 create_portfolio 一并移除。注意：存量 portfolio 工作区的**读取/迁移**仍由
 scripts/migrate_workspace.py 承载（其内 is_portfolio 分支为存量兼容有意保留，
@@ -185,7 +185,7 @@ author: AI辅助生成
 - **启动日期**：YYYY-MM-DD
 - **计划完成**：YYYY-MM-DD
 
-## 2. 子项目清单（单项目模式恒空；跨项目请换用 ChronoPM-Portfolio）
+## 2. 子项目清单（单项目模式恒空；跨项目由本包 portfolio-skill/ 承载）
 
 | 项目ID | 子项目名称 | 一句话描述 | 当前里程碑 | PM | 状态 |
 |---|---|---|---|---|---|
@@ -222,7 +222,7 @@ author: AI辅助生成
 
 | 内容类型 | 目标文件 |
 |---|---|
-| 人员变动 / 请假 / 借调 | `todos/{{日期}}/_index.md` §1 花名册 + 个人待办 §0.5（跨项目共享人力查询请用 ChronoPM-Portfolio） |
+| 人员变动 / 请假 / 借调 | `todos/{{日期}}/_index.md` §1 花名册 + 个人待办 §0.5（跨项目共享人力查询由本包 portfolio-skill/ 承载） |
 | 新需求 / 需求变更 | `requirements/requirement-register.md` 或 `change-log.md` |
 | 任务进展 / 任务完成 | `todos/{{日期}}/{{执行人}}.md` |
 | 风险识别 | `risks/risk-register.md` |
@@ -232,7 +232,7 @@ author: AI辅助生成
 | 成本 / 预算变动 | `project-info/budget.md` |
 | 个人工作汇报 / 日报内容归档 | `todos/{{日期}}/{{执行人}}.md`（§2 存档 + §3 工作日志） |
 | 项目日报（按需生成的存根，可能不存在） | `reports/daily/project/YYYYMM/` |
-| 会议纪要 | `meetings/`（跨项目汇总周报请换用 ChronoPM-Portfolio）|
+| 会议纪要 | `meetings/`（跨项目汇总周报由本包 portfolio-skill/ 承载）|
 
 ## 8. AI 处理前必读声明
 

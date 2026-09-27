@@ -116,7 +116,7 @@ ai/outputs/{YYYYMMDDHHMMSS}/
 
 ## 8. 来源追溯
 
-除 `Type=skill_gap` 外，所有生成物必须在 `manifest.md` 中记录来源文件（如本项目周报来自本项目日报/待办/风险/问题等）。skill_gap 的来源写在需求文件 YAML `source_files`。跨项目汇总周报请到 ChronoPM-Portfolio 对话生成，本包不以其为归档目标。**不得生成无来源记录的正式文件。**
+除 `Type=skill_gap` 外，所有生成物必须在 `manifest.md` 中记录来源文件（如本项目周报来自本项目日报/待办/风险/问题等）。skill_gap 的来源写在需求文件 YAML `source_files`。跨项目汇总周报由本包 `portfolio-skill/` 承载，本包不以其为归档目标。**不得生成无来源记录的正式文件。**
 
 ---
 
@@ -139,9 +139,9 @@ ai/outputs/{YYYYMMDDHHMMSS}/
 | 内容类型 | 归档路径 |
 |---|---|
 | 本项目周报 | `reports/weekly/{year}/` |
-| 集周报 / 跨项目周报 | 集周报请到 ChronoPM-Portfolio 对话（本包不归档到 `portfolio/reports/`） |
+| 集周报 / 跨项目周报 | 集周报由本包 `portfolio-skill/` 承载（本包不归档到 `portfolio/reports/`） |
 | 本项目会议纪要 | `meetings/{year}/` |
-| 跨项目会议纪要 | 本项目相关部分归档到 `meetings/{year}/`；跨项目汇总请到 ChronoPM-Portfolio |
+| 跨项目会议纪要 | 本项目相关部分归档到 `meetings/{year}/`；跨项目汇总由本包 `portfolio-skill/` 承载 |
 | 需求评审纪要 | `meetings/{year}/` 或 `reviews/` |
 | 设计评审纪要 | `reviews/` |
 | P&L 导出 | `ai/outputs/`（必要时更新本项目 `project-info/budget.md`） |
@@ -214,7 +214,7 @@ ai/outputs/{YYYYMMDDHHMMSS}/
 | `10-update-trigger-rules.md` | 识别"要不要更新事实源"（→ `ai/`） |
 | `11-output-artifact-rules.md` | 识别"要不要生成外部文件/导出物"（→ `ai/outputs/`） |
 
-**示例：** "记录一下，陈佳菁被抽调" → 触发 `10`（更新事实源）；"帮我生成周报" → 触发 `11`（生成输出物）；"帮我生成本周项目集周报，并归档" → 提示到 ChronoPM-Portfolio 对话（本包只生成本项目周报）。
+**示例：** "记录一下，陈佳菁被抽调" → 触发 `10`（更新事实源）；"帮我生成周报" → 触发 `11`（生成输出物）；"帮我生成本周项目集周报，并归档" → 由本包 `portfolio-skill/` 承载（本包单项目规则只生成本项目周报）。
 
 ## 16. 存储生命周期
 

@@ -139,7 +139,7 @@ AI 进入工作区
 （如暂未确定可回答"跳过"）
 ```
 
-**目标文件**：当天 `todos/{today}/_index.md`（**必须含 §1 花名册与 §6 TD 缩写**；不创建 `resource-register.md`。跨项目共享人员提示用 ChronoPM-Portfolio，本包不写集层索引）
+**目标文件**：当天 `todos/{today}/_index.md`（**必须含 §1 花名册与 §6 TD 缩写**；不创建 `resource-register.md`。跨项目共享人员由本包 `portfolio-skill/` 承载，本包不写集层索引）
 
 **规则**：
 - **禁止**创建 `resources/resource-register.md` / `transfer-log.md`。

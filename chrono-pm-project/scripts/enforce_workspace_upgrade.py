@@ -137,6 +137,13 @@ def enforce(root: Path) -> int:
             return 0
         if worst or blocked:
             return worst
+        qs = Path(__file__).resolve().parent.parent / "query-skill" / "scripts"
+        if str(qs) not in sys.path:
+            sys.path.insert(0, str(qs))
+        import glossary_table
+        if glossary_table.refresh_glossary_index(ai) != 0:
+            print("集层术语指针未完成，不改版本号")
+            return 1
         ws = _read_version(ai)
         if _vcmp(SKILL_VERSION, ws) > 0:
             stamp_skill_version(ai, "portfolio", SKILL_VERSION, gates_passed=True)
@@ -150,6 +157,13 @@ def enforce(root: Path) -> int:
         return 0
     install_project_hook(project)
     install_user_hook()
+    qs = Path(__file__).resolve().parent.parent / "query-skill" / "scripts"
+    if str(qs) not in sys.path:
+        sys.path.insert(0, str(qs))
+    import glossary_table
+    if glossary_table.apply_member(ai) != 0:
+        print("说法表或版本戳未完成，不改版本号")
+        return 1
     code = compile_workspace(str(project))
     if code != 0:
         print("存量或 wiki 未完成，不改版本号")

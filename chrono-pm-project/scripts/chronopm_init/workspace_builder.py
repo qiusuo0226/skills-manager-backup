@@ -4,7 +4,7 @@
 职责：编排单项目工作区创建流程。函数体在
 CR-20260810-001 中由 scripts/init_workspace.py 原样迁移，保证行为零变化。
 v3.0.0（P-14）：create_portfolio 项目集初始化分支已删除，init 仅产
-单项目工作区；集工作区归 ChronoPM-Portfolio 伴生包（无 init 脚本）。
+单项目工作区；集工作区归本包 portfolio-skill/（无独立 init）。
 存量 portfolio 工作区的读取/迁移仍由 scripts/migrate_workspace.py 承载。
 """
 

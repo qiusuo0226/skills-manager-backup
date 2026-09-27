@@ -4,7 +4,7 @@
 
 ## Skill Purpose
 
-本文件是 **ChronoPM-Project**（单项目管理）核心契约。跨项目归集见 ChronoPM-Portfolio（工人不手搓成员正文；手递须 CALL 本包写过程；高风险走建议更新后手递；聚合不落盘为数据源；人的视图实时聚合）。
+本文件是 **ChronoPM-Project**（单项目管理）核心契约。跨项目归集加载包内 `portfolio-skill/references/`（工人不手搓成员正文；手递须 CALL 本包写过程；高风险走建议更新后手递；聚合不落盘为数据源；人的视图实时聚合）。
 
 ## Hard Constraints
 
@@ -68,7 +68,7 @@
 | Capability | ID | Description |
 |---|---|---|
 | daily_report | DAILY | 个人/项目日报管理（含合并幂等性） |
-| weekly_report | WEEKLY | 本项目周报生成（集周报属 ChronoPM-Portfolio） |
+| weekly_report | WEEKLY | 本项目周报生成（集周报属 `portfolio-skill`） |
 | pm_daily_todo | PMTODO | PM 每日待办（9 章节全景视图） |
 | quick_query | QUERY | 快速查询（索引优先） |
 | output_artifact | OUTPUT | 输出物管理（批次目录+草稿确认） |
@@ -81,7 +81,7 @@
 | update_trigger | TRIG | 更新意图识别和触发 |
 | init_wizard | INIT | 项目初始化向导（六步引导建档） |
 | completeness_check | COMPLENESS | 信息完整性巡检与补全提醒（P0-P3分级） |
-| cross_source_requirement_intelligence | RI | 本项目 contract-register + atoms/canonical + {type}-source；跨项目由 Portfolio |
+| cross_source_requirement_intelligence | RI | 本项目 contract-register + atoms/canonical + {type}-source；跨项目由 `portfolio-skill` |
 
 ## Rule Layer Classification
 
@@ -113,13 +113,13 @@ Skill 本体与工作区结构采用两个独立版本号，随契约 diff 联�
 
 **现行 workspace schema：0.17.0**（3.27.0：`ai/registers/` 范围登记表必填，空表合法；回填清零迁移义务）。两版本号不得混用：Skill 包升级改 schemaVersion；工作区目录结构变更改 workspace schema（硬约束 8）。
 
-## ChronoPM-Portfolio 伴生包契约（v3.0.0）
+## 包内 portfolio-skill 只读归集（v4.0.0）
 
-ChronoPM-Portfolio 为只读归集伴生包（skill name `chrono-pm-portfolio`，modes `viewer`，无 init 脚本），与 ChronoPM-Project 同版本发布、双基线归档。只读五条硬约束：
+`portfolio-skill/` 是 ChronoPM-Project 内的能力目录，不是独立技能，不另发 zip。集根由本包加载 `portfolio-skill/references/`。只读五条硬约束：
 
 1. **对成员项目 `ai/` 零写**：不得向任何成员项目的事实源目录写入。
-2. **只写 `portfolio/` 归集区**：伴生包自身仅可在归集工作区 `portfolio/` 下产出。
-3. **变更走建议更新清单**：需改成员项目数据时，只产出建议更新清单，由成员项目的 ChronoPM-Project 确认后执行。
+2. **只写 `portfolio/` 归集区**：本能力目录仅可在归集工作区 `portfolio/` 下产出。
+3. **变更走建议更新清单**：需改成员项目数据时，只产出建议更新清单，由 ChronoPM-Project 在成员根确认后执行。
 4. **聚合不落盘为数据源**：跨项目聚合结果仅作为视图产物，不得成为后续计算的事实源。
 5. **人的视图实时聚合**：面向人的汇总视图按请求实时聚合生成，不维护常驻副本。
 

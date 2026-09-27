@@ -39,11 +39,23 @@ def _project_root_from_ai(ai_dir: Path) -> Path:
     return ai_dir.parent if ai_dir.name == "ai" else ai_dir
 
 
+def _v400():
+    qs = Path(__file__).resolve().parent.parent / "query-skill" / "scripts"
+    if str(qs) not in sys.path:
+        sys.path.insert(0, str(qs))
+    import glossary_table
+    return glossary_table
+
+
 def ensure_stock_compiled(ai_dir: Path, dry_run: bool = False) -> bool:
-    """3.30.2 存量闸：未过不得盖戳。集根跳过（成员根各自跑）。"""
+    """3.30.2 存量闸：未过不得盖戳。集根跳过成员编页。4.0.0 起成员还要并说法表。"""
     ai = ai_dir
     if (ai / "portfolio").is_dir() and (ai / "projects").is_dir():
         print("  集根不编成员主题页；各成员根自行 compile")
+        if _vcmp(CURRENT_SKILL_VERSION, "4.0.0") >= 0 and not dry_run:
+            if _v400().refresh_glossary_index(ai) != 0:
+                print("  集层术语指针未完成，不得更新 skillVersion")
+                return False
         return True
     try:
         from compile_source_digests import compile_workspace
@@ -55,6 +67,10 @@ def ensure_stock_compiled(ai_dir: Path, dry_run: bool = False) -> bool:
     if code != 0:
         print("  存量未完成，不得更新 skillVersion，不得称升级成功")
         return False
+    if _vcmp(CURRENT_SKILL_VERSION, "4.0.0") >= 0 and not dry_run:
+        if _v400().apply_member(ai) != 0:
+            print("  说法表或版本戳未完成，不得更新 skillVersion")
+            return False
     print("  存量检查通过")
     return True
 from chronopm_init.config import (
@@ -885,6 +901,20 @@ VERSION_CAPABILITIES = [
         "new_dirs": ["registers"],
         "new_files": ["registers/scope-register.md", "registers/_index.md"],
         "note": "v3.27.0 schema 0.17.0：范围登记表；entities.relations；推导失败门；回填清零健康项。",
+    },
+    {"version": "3.28.0", "schema": "0.17.0", "capabilities": [], "new_dirs": [], "new_files": [], "note": "v3.28.0 占位，便于版本链走到 4.0.0。"},
+    {"version": "3.29.0", "schema": "0.17.0", "capabilities": [], "new_dirs": [], "new_files": [], "note": "v3.29.0 占位。"},
+    {"version": "3.30.0", "schema": "0.17.0", "capabilities": [], "new_dirs": [], "new_files": [], "note": "v3.30.0 占位。"},
+    {"version": "3.30.1", "schema": "0.17.0", "capabilities": [], "new_dirs": [], "new_files": [], "note": "v3.30.1 占位。"},
+    {"version": "3.30.2", "schema": "0.17.0", "capabilities": [], "new_dirs": [], "new_files": [], "note": "v3.30.2 占位。"},
+    {"version": "3.30.3", "schema": "0.17.0", "capabilities": [], "new_dirs": [], "new_files": [], "note": "v3.30.3 占位。"},
+    {
+        "version": "4.0.0",
+        "schema": "0.17.0",
+        "capabilities": ["speech_table_merge", "fact_stamps_init"],
+        "new_dirs": [],
+        "new_files": [],
+        "note": "v4.0.0：说法表拆成两张各 7 列；单文件版本戳；查询与项目集收进能力目录。无新目录。",
     },
 ]
 
@@ -2338,6 +2368,12 @@ def migrate_workspace(project_root: str, dry_run: bool = False, target_version: 
         print("禁止：代迁待办正文、按 N-30/31 批量改日期进度、灌历史工时表、建历史空日目录")
         print("根级 backup-* 位址豁免，只在 migration-log 记视为 backup")
         print(f"{'='*40}")
+
+    needs_v400 = _vcmp(skill_version, "4.0.0") >= 0 and (
+        current_ws_version == "unknown" or _vcmp(current_ws_version, "4.0.0") < 0
+    )
+    if needs_v400:
+        print("v4.0.0：成员根合并说法表并写版本戳；集根只重写术语指针。失败不盖戳。")
 
     needs_v390 = _vcmp(skill_version, "3.9.0") >= 0 and (
         current_ws_version == "unknown"

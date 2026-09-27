@@ -38,7 +38,7 @@
 | Case ID | Input | Expected | Type |
 |---|---|---|---|
 | WR-001 | 帮我生成周报 | 先询问输出方式或生成 Markdown 草稿，不直接导出正式文件 | positive |
-| WR-002 | 项目集模式下生成周报 | 引导切 ChronoPM-Portfolio；本包只出本项目周报 | positive |
+| WR-002 | 项目集模式下生成周报 | 集周报由本包 portfolio-skill/ 承载；单项目规则只出本项目周报 | positive |
 | WR-003 | 生成周报 Excel | 写入 `ai/outputs/{timestamp}/files/`，不直写 `ai/` 事实源目录（v2.1.0） | regression |
 | WR-004 | 修改刚才的周报 | 复用同一 batch 目录，不新建时间戳 | regression |
 | WR-005 | 周报生成后 | 按自然周从 todos 整段汇聚；已完结周成存根；不每日累积草稿 | positive |
@@ -59,7 +59,7 @@
 | OA-002 | 帮我生成 Excel 周报 | 写入 `ai/outputs/{timestamp}/files/`，不直写 `ai/` 事实源目录（v2.1.0） | regression |
 | OA-003 | 修改刚才的周报内容 | 复用同一 batch，追加 `revisions/` | regression |
 | OA-004 | 确认后导出 | 生成 final.md，再导出到 `files/` | positive |
-| OA-005 | 归档到项目集周报 | 引导切 ChronoPM-Portfolio 对话，本包不写 `portfolio/` | regression |
+| OA-005 | 归档到项目集周报 | 集周报由本包 portfolio-skill/ 承载，本包不写 `portfolio/` | regression |
 | OA-006 | 生成文件路径 | 使用 `ai/outputs/`，生成物不直写 `ai/` 事实源目录（v2.1.0） | regression |
 
 ## 6. Continuity（历史阶段衔接）
@@ -1409,10 +1409,10 @@
 | TR-002 | 「各项目进度」 | 匹配 Portfolio | positive |
 | TR-003 | 仅 Project，「项目集整体状态」 | 提示安装/启用 Portfolio；不代做集层聚合 | positive |
 | TR-004 | 仅 Portfolio，要写成员待办 | 提示安装/启用 Project；不手搓 todos | negative |
-| TR-005 | 读两包 SKILL.md description | 均含 `ChronoPM-Project` 与 `ChronoPM-Portfolio` | positive |
+| TR-005 | 读 Project skill.json description | 含集层触发词；无「请安装 ChronoPM-Portfolio」 | positive |
 | TR-006 | 读 Portfolio description | 「触发：」不含日报、xlsx、csv、入库、投喂、粘贴、工作包、计划（裸词）；「须同时安装 ChronoPM-Project」只一次 | negative |
-| TR-007 | 读 Project description | 「触发：」含记日报、待办、入库、xlsx 及 `ChronoPM-Portfolio` | positive |
-| TR-008 | WR-002 / OA-005 | 仍引导切 Portfolio，本包不写 `portfolio/` | regression |
+| TR-007 | 读 Project description | 「触发：」含记日报、待办、入库、xlsx 及项目集；不要求另装技能 | positive |
+| TR-008 | WR-002 / OA-005 | 集周报由本包 portfolio-skill/ 承载，本包不写 `portfolio/` | regression |
 | TR-009 | 集根贴日报或混报，两包都在 | Portfolio ingest；Project 不得写入任一 `projects/{名}/ai/todos` | negative |
 | TR-010 | 成员根 `--project-root=…/projects/{名}` 记日报 | Project 写入该成员 | positive |
 | TR-011 | 集根 Portfolio 高置信混报后 §2.2 CALL | 成员 todos 经 Project 写过程落盘；硬闸不得拦住 CALL | positive |
@@ -1641,6 +1641,26 @@
 | UE-016 | 已拆源对不上需求，或有需求但没有工包 | 写入迁移日志和待裁定；退出码非 0；版本号不变 | negative |
 | UE-017 | 脚本跑完 | 不出现 ai/wiki/；主题页不出现 [[ | negative |
 
+## 96. 查询定位与单包（v4.0.0 CR-20260923-001）
+
+施工只认合计 **1041**（1028+13）。查询不得先跑全量刷新。说法表少键不得盖戳。
+
+| Case ID | Input | Expected | Type |
+|---|---|---|---|
+| QV-001 | 说法表已有唯一路径且文件未变 | 退出码 0，只碰说法表和该文件，changed=false | positive |
+| QV-002 | 该文件哈希已变 | changed=true，只更新这一条戳 | positive |
+| QV-003 | 说法未命中 | 退出码 2，这一次不写说法表 | negative |
+| QV-004 | 一句话命中两条不同路径 | 退出码 3 | negative |
+| QV-005 | project-root 是集根 | 退出码 4 | negative |
+| QV-006 | 旧词库行和 alias_index 都在 | 合并后键都在，第二遍不增行 | regression |
+| QV-007 | 合并少一键 | 非 0，不改 skillVersion | negative |
+| QV-008 | 打包 Project | 无第二个 Portfolio zip，包内有两个能力目录 | regression |
+| QV-009 | 查询规则 | 不要求每次查询跑 refresh_views.py --all | regression |
+| QV-010 | 已绑仍空 | 沿用 3.30.3，不盖戳 | regression |
+| QV-011 | 0 命中后 --register | 新增一行，来源=对话登记，状态=pending | positive |
+| QV-012 | 废弃工作包有后继 | 别名行指向后继 | regression |
+| QV-013 | 只跑 --flush-heat | 热度增加，说法表有效戳不变 | regression |
+
 ## 回归用例统计
 
 | 模块 | 用例数 | 正向 | 回归 |
@@ -1740,4 +1760,5 @@
 | 快扫后改点名人 (93) | 6 | 3 | 3 |
 | 升级存量闸 (94) | 8 | 2 | 6 |
 | 升级执行程序强制 (95) | 17 | 6 | 11 |
-| **合计** | **1028** | **584** | **444** |
+| 查询定位与单包 (96) | 13 | 3 | 10 |
+| **合计** | **1041** | **587** | **454** |

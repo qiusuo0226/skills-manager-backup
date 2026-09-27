@@ -20,7 +20,7 @@
 | 属性 | 值 |
 |---|---|
 | Skill 名称 | ChronoPM — Markdown 驱动的 AI 项目管理技能 |
-| 当前版本 | 3.30.3（ChronoPM-Project + ChronoPM-Portfolio 共用版本线；版本单一事实源为 `scripts/_version.py`） |
+| 当前版本 | 4.0.0（只发行 ChronoPM-Project；查询与项目集是包内能力目录；版本单一事实源为 `scripts/_version.py`） |
 | Workspace Schema | 详见 `scripts/_version.py`（WORKSPACE_SCHEMA_VERSION） |
 | 创建日期 | 2026-08-09 |
 | 最后更新 | 2026-09-22（v3.30.3：程序执行升级，已拆标准文件串联）；2026-09-21（v3.30.2：快扫结转 + 存量回填）；更早见 CHANGELOG |
@@ -205,9 +205,9 @@ ChronoPM 建立在三层信任模型之上：
 
 | Capability ID | Capability | Status | Maturity | Rule Files | Templates | Notes |
 |---|---|---|---|---|---|---|
-| CAP-001 | Workspace Initialization | stable | L4 | `06-file-rules.md` | project-context, project-index, workspace-health 等 | init_workspace.py 仅产单项目工作区（v3.0.0 P-14：portfolio 初始化分支删除；集工作区归 ChronoPM-Portfolio，无 init） |
+| CAP-001 | Workspace Initialization | stable | L4 | `06-file-rules.md` | project-context, project-index, workspace-health 等 | init_workspace.py 仅产单项目工作区（v3.0.0 P-14：portfolio 初始化分支删除；集工作区归 `portfolio-skill/`，无独立 init） |
 | CAP-002 | Daily Report Management | stable | L4 | `01-daily-report-rules.md`, `00-pm-main-rules.md` | personal-daily-todo, project-daily, daily-todo-binding | 含合并幂等性 + 工作日志段联动；v2.1.0：日报两步流程（原文先逐字存档 §2 日报存档段，再映射加工进 §3） |
-| CAP-003 | Weekly Report (Project) | stable | L3 | `01-daily-report-rules.md` | weekly-report | 本项目周报；跨项目汇总周报归 ChronoPM-Portfolio（F-6，v3.0.0：09 号迁出、集周报模板迁伴生包） |
+| CAP-003 | Weekly Report (Project) | stable | L3 | `01-daily-report-rules.md` | weekly-report | 本项目周报；跨项目汇总周报归 `portfolio-skill/`（F-6，v3.0.0：09 号迁出；4.0.0 起模板在包内 `portfolio-skill/`） |
 | CAP-004 | PM Daily Todo (9-section Panorama) | stable | L3 | `05-query-rules.md`, `22-carried-over-rules.md` | 待办文件 + 绑定文件 | 全团队聚合视图，禁止只列 PM 个人任务；v2.1.0：核心执行表新增进度列（8 列硬上限）+ 进度↔状态双轨仲裁 |
 | CAP-005 | Quick Query (Targeted-Read-First) | stable | L3 | `05-query-rules.md`, `14-self-check-rules.md` | 待办文件 + 绑定文件 | 定向读取优先，禁止默认全量扫描；v1.21.0 新增 §6.7 倒排每日矩阵查询路由（人员×日期，portfolio 多子项目待办文件遍历+存量降级） |
 | CAP-006 | Output Artifact Management | stable | L3 | `11-output-artifact-rules.md` | outputs-index, output-manifest | 批次目录 + 草稿/确认/导出流程；v2.1.0：outputs/ → ai/outputs/ 路径整合 |
@@ -284,7 +284,7 @@ ChronoPM 建立在三层信任模型之上：
 | 06 | `06-file-rules.md` | 文件：命名、目录边界、创建/更新/瘦身/归档、索引、安全 |
 | 07 | `07-requirement-rules.md` | 需求：分类、评审、追踪矩阵、§7 级联传播规则 |
 | 08 | `08-change-control-rules.md` | 变更：流程、影响分析、审批、§9 级联传播规则 |
-| 09 | `09-portfolio-rules.md` | 退役指针页（v3.0.0）：不加载、无规则条款，仅指向 ChronoPM-Portfolio；原规则实体已迁伴生包（单项目资源条款并入 06） |
+| 09 | `09-portfolio-rules.md` | 退役指针页（v3.0.0）：不加载、无规则条款，仅指向 `portfolio-skill/references/`；原规则实体在包内该目录（单项目资源条款并入 06） |
 | 10 | `10-update-trigger-rules.md` | 触发：四级触发、语义信号、权限分级 |
 | 11 | `11-output-artifact-rules.md` | 输出物：批次目录、草稿确认导出 |
 | 12 | `12-excel-generation-rules.md` | Excel：8 种文档生成规范 |
@@ -606,6 +606,7 @@ ChronoPM 建立在三层信任模型之上：
 | 3.28.0 | 对外拍板禁止技能黑话：底线19分段+五句自检；00拆段补词典；reply-rules对错例；待办编号除外；schema 保持 0.17.0；Module 89（总计 964） | CR-20260911-001 / upgrade-to-3.28.0.md |
 | 3.30.2 | 结转快扫三问 + compile 回填 3.30 主题页；做不完不得盖戳；schema 保持 0.17.0；Module 93+94（总计 1011） | CR-20260920-003～004 / upgrade-to-3.30.2.md |
 | 3.30.3 | 程序执行升级；已拆标准文件串成来源指针、文档链接和工作包编号；schema 保持 0.17.0；Module 95（总计 1028） | CR-20260922-001 / upgrade-to-3.30.3.md |
+| 4.0.0 | 查询与项目集收进能力目录；单文件版本戳；说法表合并；不再发行 Portfolio 包；schema 保持 0.17.0；Module 96（总计 1041） | CR-20260923-001 / upgrade-to-4.0.0.md |
 | 3.30.1 | 原件指纹比对 + 属性串文档 + missing_page 巡检 + as_of 不参与 skip；schema 保持 0.17.0；SW-017（总计 997） | CR-20260920-002 / upgrade-to-3.30.1.md |
 | 3.30.0 | 单源主题页（_digest 栏目页 + source_digest_status 过期检测）；schema 保持 0.17.0；Module 92（总计 996） | CR-20260920-001 / upgrade-to-3.30.0.md |
 | 3.29.0 | 投喂一次做完（底线20；投喂不问绑包、口述仍问）+ 源文档抽出图 figures/；schema 保持 0.17.0；Module 90+91（总计 980） | CR-20260913-001～002 / upgrade-to-3.29.0.md |

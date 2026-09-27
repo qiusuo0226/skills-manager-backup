@@ -41,7 +41,7 @@ author: AI辅助生成
 ## 4. 团队成员
 
 > 人员当前状态以最新合法日 `todos/{最新合法日}/_index.md` §1（花名册）为事实源。进出组见个人待办 §0.5。
-> 此处仅保留指针，不复制完整团队列表，避免与花名册不一致。跨项目共享人力查询请用 ChronoPM-Portfolio，本包不写 `portfolio/`、不写 `projects/{子项目}/`。
+> 此处仅保留指针，不复制完整团队列表，避免与花名册不一致。跨项目共享人力查询由本包 `portfolio-skill/` 承载，本包不写 `portfolio/`、不写 `projects/{子项目}/`。
 
 → 人员当前状态：`todos/{最新合法日}/_index.md` §1
 → 人员进出组：个人待办 `todos/{date}/{姓名}.md` §0.5
@@ -69,7 +69,7 @@ author: AI辅助生成
 
 | 内容类型 | 目标文件 |
 |---|---|
-| 人员变动 / 请假 / 借调 | 最新合法日 `todos/{最新合法日}/_index.md` §1 + 个人待办 §0.5（跨项目共享人力查询请用 ChronoPM-Portfolio） |
+| 人员变动 / 请假 / 借调 | 最新合法日 `todos/{最新合法日}/_index.md` §1 + 个人待办 §0.5（跨项目共享人力查询由本包 `portfolio-skill/` 承载） |
 | 新需求 / 需求变更 | `requirements/requirement-register.md` 或 `change-log.md` |
 | 任务进展 / 任务完成 | `todos/{date}/{owner}.md` |
 | 风险识别 | `risks/risk-register.md` |
@@ -79,7 +79,7 @@ author: AI辅助生成
 | 成本 / 预算变动 | `project-info/budget.md` |
 | 个人工作汇报 / 日报内容归档 | `todos/{date}/{owner}.md`（§2 存档 + §3 工作日志） |
 | 项目日报（按需生成的存根，可能不存在） | `reports/daily/project/YYYYMM/` |
-| 会议纪要 | `meetings/`（跨项目汇总周报请换用 ChronoPM-Portfolio） |
+| 会议纪要 | `meetings/`（跨项目汇总周报由本包 `portfolio-skill/` 承载） |
 
 ## 8. AI 处理前必读声明
 

@@ -356,7 +356,7 @@ Excel 文件生成到 `ai/outputs/{batch_id}/files/` 目录下（v2.1.0 起 outp
 
 ### 6.3 跨项目汇总周报
 
-本包只导出单项目周报（§6.2）。跨项目汇总周报请到 ChronoPM-Portfolio 对话生成，不从本包写 `portfolio/reports/`。
+本包只导出单项目周报（§6.2）。跨项目汇总周报由本包 `portfolio-skill/` 承载，不从本包写 `portfolio/reports/`。
 
 ---
 

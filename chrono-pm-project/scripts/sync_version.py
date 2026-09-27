@@ -5,7 +5,7 @@
     python ChronoPM-Project/scripts/sync_version.py
 前提：先手动修改 scripts/_version.py 中的 SKILL_VERSION，再运行本脚本。
 
-CR-G：包内触点在 ChronoPM-Project/；README×2 在仓库根；Portfolio 版本锁步。
+包内触点在 ChronoPM-Project/；README×2 在仓库根。4.0.0 起没有独立 Portfolio 可锁步。
 """
 import json
 import os
@@ -17,7 +17,6 @@ REPO_ROOT = os.path.dirname(PKG_ROOT)
 if os.path.isfile(os.path.join(PKG_ROOT, "README.md")):
     # 旧布局兜底（仓库根即包根）
     REPO_ROOT = PKG_ROOT
-PORTFOLIO_ROOT = os.path.join(REPO_ROOT, "ChronoPM-Portfolio")
 
 # 1. 从唯一源头读取版本
 version_mod_path = os.path.join(PKG_ROOT, "scripts", "_version.py")
@@ -102,20 +101,5 @@ for name, pat_title, pat_table in (
     with open(path, "w", encoding="utf-8") as f:
         f.write(updated)
     synced.append(name)
-
-# Portfolio 锁步
-if os.path.isdir(PORTFOLIO_ROOT):
-    pv = os.path.join(PORTFOLIO_ROOT, "VERSION")
-    if os.path.exists(pv):
-        sync_version_file(pv)
-        synced.append("ChronoPM-Portfolio/VERSION")
-    ps = os.path.join(PORTFOLIO_ROOT, "SKILL.md")
-    if os.path.exists(ps):
-        sync_skill_md(ps)
-        synced.append("ChronoPM-Portfolio/SKILL.md")
-    pj = os.path.join(PORTFOLIO_ROOT, "skill.json")
-    if os.path.exists(pj):
-        sync_skill_json(pj)
-        synced.append("ChronoPM-Portfolio/skill.json")
 
 print(f"Synced version {version} to: {', '.join(synced)}")

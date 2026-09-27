@@ -770,17 +770,33 @@ def parse_glossary(path: Path) -> tuple[dict, list]:
         return alias, corrections
     text = path.read_text(encoding="utf-8")
     s1 = _section(text, "1.")
-    for row in _table_rows(s1):
-        if len(row) < 6 or row[0] in ("编号",):
+    parsed = _table_rows(s1)
+    header = parsed[0] if parsed else []
+    new_shape = "说法" in header
+    speech_i = header.index("说法") if new_shape else 1
+    canon_i = header.index("登记名") if new_shape else 2
+    status_i = header.index("状态") if "状态" in header else 5
+    path_i = header.index("路径") if "路径" in header else None
+    for row in parsed[1:]:
+        if len(row) <= max(speech_i, canon_i):
             continue
-        gid, orig, canon, status = row[0], row[1], row[2], row[5] if len(row) > 5 else ""
-        if status != "confirmed":
+        status = row[status_i] if len(row) > status_i else ""
+        if new_shape:
+            if status == "废弃":
+                continue
+        elif status != "confirmed":
             continue
-        rec = {"id": gid, "type": "term", "canonical": canon}
-        alias[orig] = rec
+        speech = row[speech_i]
+        canon = row[canon_i]
+        rel = row[path_i] if path_i is not None and len(row) > path_i else ""
+        rec = {"id": row[0], "type": "term", "canonical": canon, "path": rel}
+        if speech:
+            alias[speech] = rec
         if canon and canon not in alias:
             alias[canon] = rec
     s2 = _section(text, "2.")
+    if "已并入第 1 表" in s2:
+        return alias, corrections
     for row in _table_rows(s2):
         if len(row) < 3 or row[0] in ("编号",):
             continue
@@ -1260,6 +1276,8 @@ def run(root: Path, flags: argparse.Namespace) -> int:
         print(f"write failed: {e}", file=sys.stderr)
         return 1
 
+    prev_state = load_state(ai)
+    stamps = prev_state.get("fact_stamps") if isinstance(prev_state.get("fact_stamps"), dict) else {}
     state = {
         "facts_fingerprint": facts_fp,
         "journal_fingerprint": journal_fp,
@@ -1267,7 +1285,16 @@ def run(root: Path, flags: argparse.Namespace) -> int:
         "journal": journal,
         "views": views,
         "source_digest_status": digest_status,
+        "fact_stamps": stamps,
     }
+    try:
+        qs = Path(__file__).resolve().parent.parent / "query-skill" / "scripts"
+        if str(qs) not in sys.path:
+            sys.path.insert(0, str(qs))
+        import glossary_table
+        glossary_table.fix_successor_rows(ai)
+    except Exception as exc:
+        print(f"successor rows skipped: {exc}", file=sys.stderr)
     _atomic_write(ai / ".state.json", json.dumps(state, ensure_ascii=False, indent=2) + "\n")
     print("refresh_views ok", ai)
     return 0

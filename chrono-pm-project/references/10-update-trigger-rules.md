@@ -1,6 +1,6 @@
 # 更新触发规则
 
-本规则用于提升 ChronoPM Skill 对用户更新意图的识别能力。AI 不应只在用户明确指定目标文件时才更新，而应主动识别用户输入、上传文件或粘贴内容中可能产生的项目管理更新事项。联邦集工作区的跨项目材料由 ChronoPM-Portfolio 01 §2.1 感知，本包不在单项目对话代拆他项目。
+本规则用于提升 ChronoPM Skill 对用户更新意图的识别能力。AI 不应只在用户明确指定目标文件时才更新，而应主动识别用户输入、上传文件或粘贴内容中可能产生的项目管理更新事项。联邦集工作区的跨项目材料由本包 `portfolio-skill/` 的 01 号规则 §2.1 感知，本包不在单项目对话代拆他项目。
 
 ---
 
@@ -175,7 +175,7 @@
 技能做不到、做不了、这是 skill 的问题、这是技能的问题、记成升级需求、记成技能缺口、记一份技能需求、当前技能没有这个能力、规则里没有、技能升级需求
 
 → 触发：加载 `skill-gap-skill/references/gap-capture-rules.md`（P-SKILL-GAP → P-OUTPUT）。产物 `ai/outputs/{批次}/需求-{短标题}.md`。先定向扫描已装 Skill + 读 `outputs/index.md` 做指纹匹配（无 7 日窗）；同指纹原位更新，禁止 `rev-NNN`。
-→ **不是**本信号：完整性巡检缺字段（19）；等确认（pm-decisions）；拆文件（源文档信号）；换 Portfolio 能做的跨项目查询；废弃工作包（P-WP-RETIRE）；**画图/责任链图/排布图/Mermaid**（查询，走 05+11 §17，禁止当更新意图、禁止 P-OUTPUT；派生图按 11 §17）。
+→ **不是**本信号：完整性巡检缺字段（19）；等确认（pm-decisions）；拆文件（源文档信号）；改由本包 `portfolio-skill/` 做的跨项目查询；废弃工作包（P-WP-RETIRE）；**画图/责任链图/排布图/Mermaid**（查询，走 05+11 §17，禁止当更新意图、禁止 P-OUTPUT；派生图按 11 §17）。
 → 一句既像抱怨项目进度又像技能缺口：先完成项目侧合法路径；仍无路径再走本信号。
 
 #### 风险/问题信号
@@ -191,7 +191,7 @@
 #### 待办信号
 明天做、下周做、安排、计划做、待办、todo、跟进、推动、确认、推进、督促、提醒、记得
 
-→ 触发：本项目 `todos/{date}/` 待办文件 + 绑定文件 `todos/{date}/_index.md`。跨项目待办查询/结转请到 ChronoPM-Portfolio 对话。
+→ 触发：本项目 `todos/{date}/` 待办文件 + 绑定文件 `todos/{date}/_index.md`。跨项目待办查询/结转由本包 `portfolio-skill/` 承载。
 → 触发后：待办**创建**统一路由 `00-pm-main-rules.md` WF-8 归属判定（正式任务强制落待办文件）；待办**状态更新**执行状态级联检查。
 → **缺负责人**（没人认领 / Owner 空）：写入 `pm-decisions.md` **块 6**，**不落无主待办**。裁定负责人后再建。
 
@@ -205,7 +205,7 @@
 #### 资源信号
 请假、抽调、借调、支援、离场、进场、换人、顶替、B角、没人、共享、投入比例、暂停投入、转去、回到
 
-→ 触发：最新合法日 `_index.md` **§1 花名册**；有待办者同时追加个人 **§0.5**。跨项目共享人员时提示用 ChronoPM-Portfolio 包维护集层索引；本包不写 `portfolio/`。若变动同时构成风险 → 本项目 `risks/risk-register.md`。禁止再写 `resource-register` / `transfer-log`。
+→ 触发：最新合法日 `_index.md` **§1 花名册**；有待办者同时追加个人 **§0.5**。跨项目共享人员由本包 `portfolio-skill/` 维护集层索引；本包不写 `portfolio/`。若变动同时构成风险 → 本项目 `risks/risk-register.md`。禁止再写 `resource-register` / `transfer-log`。
 
 #### 工时表 / 日志量 / 能耗投喂信号
 工时表、填写量、日志量、能耗、人日、人时、成本损耗、能效、投喂工时
@@ -257,7 +257,7 @@ AI 在处理任何用户输入前，必须先读取本项目 `context/project-br
 |---|---|---|
 | 内容明确属于本项目 | 本项目 | 本项目 `ai/` 下对应事实源 |
 | 内容提到他项目名称 / 疑似非本项目 | 他项目 | **不写入**本项目；提示到对应项目对话写入 |
-| 内容中提到"整体""所有项目""全局""项目集" | 跨项目 | 提示用 ChronoPM-Portfolio 包（本包不写 `portfolio/`） |
+| 内容中提到"整体""所有项目""全局""项目集" | 跨项目 | 由本包 `portfolio-skill/` 承载（本包不写 `portfolio/`） |
 | 内容中提到人员姓名，可在本项目 `_index` §1 花名册中匹配 | 本项目 | 本项目 `todos/`（花名册 + 个人待办） |
 | 内容中提到需求编号（REQ-XXX-NNN）且可在本项目登记册匹配 | 本项目 | 本项目 `requirements/` |
 | 内容中提到待办编号（TD-xxx）且可在本项目待办匹配 | 本项目 | 本项目 `todos/` |
@@ -270,7 +270,7 @@ AI 在处理任何用户输入前，必须先读取本项目 `context/project-br
 ```markdown
 该内容似乎与当前项目不匹配。
 当前项目为【项目名称】。
-请确认：1. 属于本项目，写入当前 ai/；2. 属于他项目，请到对应项目对话写入；3. 跨项目查询/汇总，请使用 ChronoPM-Portfolio。
+请确认：1. 属于本项目，写入当前 ai/；2. 属于他项目，请到对应项目对话写入；3. 跨项目查询/汇总，由本包 `portfolio-skill/` 承载。
 ```
 
 ---
@@ -324,23 +324,23 @@ AI 在处理任何用户输入前，必须先读取本项目 `context/project-br
 | 个人工作汇报 / 个人日报 | `todos/{date}/{owner}.md`（§2 存档 + §3 工作日志） |
 | 项目日报（按需生成的存根，可能不存在） | `reports/daily/project/YYYYMM/` |
 | 本项目周报 | `reports/weekly/` |
-| 集周报 / 跨项目周报 | 请到 ChronoPM-Portfolio 对话（本包不写 `portfolio/reports/`） |
+| 集周报 / 跨项目周报 | 由本包 `portfolio-skill/` 承载（本包不写 `portfolio/reports/`） |
 | 会议纪要（本项目） | `meetings/` |
-| 会议纪要（跨项目） | 本项目只记本项目相关部分写入 `meetings/`；跨项目汇总请到 ChronoPM-Portfolio |
+| 会议纪要（跨项目） | 本项目只记本项目相关部分写入 `meetings/`；跨项目汇总由本包 `portfolio-skill/` 承载 |
 | 需求新增 | `requirements/requirement-register.md` |
 | 需求变更 | `requirements/change-log.md` |
 | 任务行动项 | `todos/{date}/{owner}.md` 待办文件 |
 | 项目内风险 | `risks/risk-register.md` |
-| 跨项目风险 | 本项目 `risks/risk-register.md`（标注影响的他项目名）；跨项目聚合请用 ChronoPM-Portfolio |
+| 跨项目风险 | 本项目 `risks/risk-register.md`（标注影响的他项目名）；跨项目聚合由本包 `portfolio-skill/` 承载 |
 | 项目内问题 | `issues/issue-register.md` |
-| 跨项目问题 | 本项目 `issues/issue-register.md`（标注他项目指针）；跨项目聚合请用 ChronoPM-Portfolio |
+| 跨项目问题 | 本项目 `issues/issue-register.md`（标注他项目指针）；跨项目聚合由本包 `portfolio-skill/` 承载 |
 | 设计决策 | `decisions/decision-log.md` |
-| 跨项目决策 | 本项目相关部分写入 `decisions/decision-log.md`；集层索引请到 ChronoPM-Portfolio |
+| 跨项目决策 | 本项目相关部分写入 `decisions/decision-log.md`；集层索引由本包 `portfolio-skill/` 承载 |
 | 人员流转 | 有待办者 `todos/{date}/{owner}.md` **§0.5**；无待办者只改 `_index` §1 |
-| 当前资源分配 | 最新合法日 `_index.md` **§1 花名册**（跨项目时提示用 ChronoPM-Portfolio 包） |
+| 当前资源分配 | 最新合法日 `_index.md` **§1 花名册**（跨项目由本包 `portfolio-skill/` 承载） |
 | 工时表 / 日志量 / 能耗投喂 | 该人待办 **§0.6**（走 01 号 §1.6）；禁止写入 `project-info/budget.md` |
-| 本项目预算/P&L | `project-info/budget.md`；跨项目汇总请用 ChronoPM-Portfolio |
-| 本项目里程碑 | `plans/PLAN-*.md`（WP §8 关键阶段）；跨项目聚合请用 ChronoPM-Portfolio |
+| 本项目预算/P&L | `project-info/budget.md`；跨项目汇总由本包 `portfolio-skill/` 承载 |
+| 本项目里程碑 | `plans/PLAN-*.md`（WP §8 关键阶段）；跨项目聚合由本包 `portfolio-skill/` 承载 |
 
 ---
 
@@ -355,7 +355,7 @@ AI 在处理任何用户输入前，必须先读取本项目 `context/project-br
 请选择：
 1. 属于本项目，写入当前 ai/
 2. 属于他项目，请到对应项目对话写入
-3. 跨项目查询/汇总，请使用 ChronoPM-Portfolio
+3. 跨项目查询/汇总，由本包 `portfolio-skill/` 承载
 ```
 
 ### 不清楚事项类型时

@@ -86,7 +86,7 @@ version: 1.0
 4. **pm_name 用途**：只回答「项目经理是谁」。两位时列两人，不自动选「我」。
 5. **「我是张三」**：写入 `current_operator`（张三可以不在 pm_name）。
 6. **边界**：两字段都不是待办事实源；不得覆盖 Owner 记录。
-7. **项目集**：Portfolio 对话「我是张三」**不得**写子项目 pm-profile。内部 V-9，对外白话请到对应项目 ChronoPM-Project 声明。禁止对用户说「建议更新清单」六字。
+7. **项目集**：本包 `portfolio-skill/` 在集根处理「我是张三」时**不得**写子项目 pm-profile。内部 V-9，对外白话请到对应项目 ChronoPM-Project 声明。禁止对用户说「建议更新清单」六字。
 8. **存量**：migrate 补空 `current_operator:`；空不是兼容回退。
 
 ## 3. 习惯分类

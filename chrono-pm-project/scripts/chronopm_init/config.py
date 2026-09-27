@@ -167,13 +167,13 @@ project: "{name}"
 # 个人日报/个人进度/结转/延期统计等模板已删除，新增 PLAN/待办文件/绑定文件模板。
 # v2.1.0：项目日报模板已删除（按需生成，无独立模板，见 01 号规则 §2.2）。
 # v3.0.0（P-13）：portfolio-weekly-template / 集级 project-index-template 迁
-# ChronoPM-Portfolio 包，Project 侧不再 init 复制（模板总数 35→33）。
+# 本包 portfolio-skill/，Project 侧不再 init 复制（模板总数 35→33）。
 # v3.5.0：+ wp-template / wp-index-template（33→35）。
 # v3.6.0：+ source-doc-meta-template / source-index-template（35→37）。
 # v3.9.0：删 pending-changes-index；+ ops-log / ops-log-index / pm-decisions /
 # requirement-index。四份 source-* 拷贝源改能力目录（见 resolve_template_path）。
 # 不预建工作区 pm-decisions.md / logs/ops 实例（懒建）。
-# v3.10.0：不追加 energy 模板；集层 logs 模板在 Portfolio 包，不进本清单。
+# v3.10.0：不追加 energy 模板；集层 logs 模板在 portfolio-skill/，不进本清单。
 ALL_TEMPLATE_FILES = [
     "weekly-report-template.md",
     "meeting-template.md",

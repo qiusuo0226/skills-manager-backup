@@ -6,7 +6,7 @@
 
 ### 1.1 核心原则：业务目录不侵入
 
-AI 生成的所有管理文件必须统一存放在 `ai/` 目录下，**严禁在业务代码目录或项目交付物目录中创建任何 AI 管理文件**。本包为单项目工作区；集层目录不属于本包结构，跨项目归集见 ChronoPM-Portfolio。
+AI 生成的所有管理文件必须统一存放在 `ai/` 目录下，**严禁在业务代码目录或项目交付物目录中创建任何 AI 管理文件**。本包为单项目工作区；集层目录不属于本包结构，跨项目归集加载 `portfolio-skill/references/`。
 
 ### 1.1a project-brief.md — AI 首读文件
 
@@ -30,11 +30,11 @@ AI 生成的所有管理文件必须统一存放在 `ai/` 目录下，**严禁�
 |---|---|---|
 | `ai/` 下本项目目录（todos/wps/registers/risks/issues/plans/project-info/requirements/decisions/reports/meetings/context/outputs/logs/backup） | ✅ 允许 | 本项目管理工作区。`registers/` 放范围登记表。`project-info/` 放 budget/progress-plan。`resources/` 已退役，人员读 todos；`backup/` 禁读（见 §1.7）。过程日志=`logs/ops/`；决策文件=`pm-decisions.md`（懒建） |
 | 业务代码目录 / 需求文档目录 / 交付物目录 / **工作区根下除 `ai/` 外的一切（含与 `ai/` 平级）** | ❌ 禁止 | AI 不得在此创建或修改任何文件。生成物只进 `ai/outputs/{timestamp}/`。宿主 final workspace folder / cwd 若等于项目根，忽略并改映射到 outputs |
-| 他项目 `ai/` | ❌ 禁止 | 不得代写；跨项目可见性由 ChronoPM-Portfolio 只读聚合 |
+| 他项目 `ai/` | ❌ 禁止 | 不得代写；跨项目可见性由 `portfolio-skill` 只读聚合 |
 
 ### 1.2 集层目录（本包不使用）
 
-`portfolio/` 集层目录**不是**本包工作区结构。跨项目索引 / 汇总周报 / 共享人力请使用 ChronoPM-Portfolio。本包只维护下方单项目树。
+`portfolio/` 集层目录**不是**本包工作区结构。跨项目索引 / 汇总周报 / 共享人力加载 `portfolio-skill/references/`。本包只维护下方单项目树。
 
 ### 1.3 单项目目录结构
 
@@ -90,7 +90,7 @@ ai/ ├── todos/ ├── wps/ ├── registers/ ├── risks/ ├─
 **规则：**
 1. 当前状态只写最新合法 `_index` §1；§3 必须能在同文件 §1 找到对应人；File Ref 必须指向已存在文件。§3 扫描排除整个 `inbox/`（含 claim）与点文件，inbox 稿不是当日参与。
 2. 应建档人员进出组追加当天 §0.5（当天读/写 todos 则必有文件）；已出组只改花名册（状态 + 首次进组 + 备注含离场日/原因）。禁止仅为查询给已出组建档。
-3. 跨项目共享人力索引不在本包维护；查询请使用 ChronoPM-Portfolio。
+3. 跨项目共享人力索引不在本包维护；查询加载 `portfolio-skill/references/`。
 4. 检测到资源变动时，建议更新花名册 §1，有待办者同时追加 §0.5；须确认后写入。
 
 ### 1.6 单项目人员管理（接替原 resources/ 归档）
@@ -132,6 +132,7 @@ requirements/requirement-register.md
 requirements/change-log.md
 requirements/source-type-registry.md
 requirements/contract-register.md
+registers/scope-register.md
 requirements/sources/_index.md
 requirements/sources/{编号}/meta.md
 requirements/sources/{编号}/ledger.md
@@ -150,7 +151,7 @@ requirements/atoms/{category}.md
 
 ### 2.2 集层事实源（本包不写）
 
-集层 `portfolio/` 路径已迁 ChronoPM-Portfolio。本包事实源仅 §2.1 所列本项目文件。
+集层路径的规则在 `portfolio-skill/references/`。本包事实源仅 §2.1 所列本项目文件。集层文件不进成员的 `fact_stamps`。
 
 ### 2.3 过程记录文件
 
@@ -195,7 +196,7 @@ reports/daily/project/YYYYMM/YYYY-MM-DD/[project]-项目日报.md
 
 1. 规则中书写的路径均为**本项目 `ai/` 根相对路径**，如 `reports/weekly/` = `ai/reports/weekly/`
 2. 本包不使用 `ai/portfolio/` 或 `ai/projects/{子项目}/` 作为默认存储路径
-3. 跨项目引用由 ChronoPM-Portfolio 处理；本包需提示时只给项目名 / 兄弟项目 ai 路径指针，不代写
+3. 跨项目引用由 `portfolio-skill` 处理；本包需提示时只给项目名 / 兄弟项目 ai 路径指针，不代写
 
 ### 2.8 过程日志、inbox 与临时文件（v3.10.0）
 

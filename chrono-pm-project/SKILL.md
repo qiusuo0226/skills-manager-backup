@@ -1,24 +1,24 @@
 ---
 name: chrono-pm-project
-version: 3.30.3
+version: 4.0.0
 schema_version: 0.17.0
-updated_at: 2026-09-22
-description: 给项目经理的单项目 AI 项目管理技能。把日报、待办、工作包、计划、合同、风险、会议纪要写进本项目 ai 目录。触发：项目管理、项目、单项目、初始化项目、工作包、WP、计划、看计划、排计划、倒排、排期、阶段、里程碑、门禁、结转、派活、待办、任务、进度、需求、变更、范围、合同、合同登记、风险、问题、决策、会议、会议纪要、纪要、拆文件、源文档、工时、能耗、人员、花名册、人员进出、进度表、xlsx、csv、投喂、粘贴、入库、归档、更新、补全、回填、评审、验收、成本、预算、复盘、历史计划、完整性巡检、词库、偏好、画图、责任链图、记日报、日报、出周报、周报、ChronoPM、ChronoPM-Project、ChronoPM-Portfolio。项目集、组合、跨项目汇总请安装并调用 ChronoPM-Portfolio。本包只写本项目。
+updated_at: 2026-09-23
+description: 项目管理：记日报、出周报、跟待办、做风险登记、写会议纪要。工作包、计划、倒排、里程碑、合同和需求写进你自己的 Markdown 文件夹；要紧的变更先问过你。跨项目只读归集在本包的 portfolio-skill/，不是单独安装的技能。Project management for daily reports, weekly reports, todos, risk registers, and meeting notes in your own Markdown folder. Material changes wait for your confirmation. Cross-project read-only rollups are the in-package portfolio-skill. 触发：项目管理、项目、项目集、组合、跨项目、初始化项目、工作包、WP、计划、看计划、排计划、倒排、排期、阶段、里程碑、门禁、结转、派活、待办、任务、进度、需求、变更、范围、合同、合同登记、风险登记、风险、问题、决策、会议、会议纪要、纪要、拆文件、源文档、工时、能耗、人员、花名册、人员进出、进度表、xlsx、csv、投喂、粘贴、入库、归档、更新、补全、回填、评审、验收、成本、预算、复盘、历史计划、完整性巡检、词库、偏好、画图、责任链图、记日报、日报、出周报、周报、集周报、ChronoPM、ChronoPM-Project、daily report、todo、task、work package、plan、schedule、milestone、risk register、risk、issue、meeting notes、weekly report、contract、requirement、portfolio、cross-project。集层规则在 portfolio-skill，查询规则在 query-skill。
 ---
-# ChronoPM-Project — 项目管理（日报/待办/合同）
+# ChronoPM-Project — 项目管理（日报/待办/计划/风险/周报）
 
 ## 1. 概述
 本技能以项目文件夹下的 `ai/` 目录为载体，以 Markdown 为项目记忆，以 AI 为副手，以人工确认为最终控制点。
 **核心理念**：事实源文件是唯一真相；日报/纪要是输入，不能替代事实源。
 **待办单一数据源**：执行状态 = `todos/{date}/{owner}.md`（一人一天一份；写入经 inbox 再合并）。PLAN = 唯一计划编排事实源（只引用 WP，不列待办）。WP 独立文件 = `wps/WP-*.md`（须有需求编号；待确认不拆待办）。需求只绑工作包，待办只绑工作包。
-**v3.0.0**：本包仅单项目。旧 portfolio 录入口废弃。跨项目归集见 ChronoPM-Portfolio。集层投喂可调用本包写过程（P-HANDOFF-ACCEPT），root 仍是本成员。
+**v4.0.0**：跨项目归集在 `portfolio-skill/`。集层投喂可调用本包写过程（P-HANDOFF-ACCEPT），root 仍是本成员。
 
 ## 2. 工作模式
 仅 **single**：全部管理文档在本项目 `ai/`。无 portfolio 模式。
 工作区三态只看当前工作区根或 `--project-root`，禁止向上翻父目录。
-（1）集根：当前根同时有 `ai/portfolio/` 与 `ai/projects/` 一级 → 本包禁止单项目写入，禁止把某个 `projects/{名}` 当作本项目落盘。材料投喂、日报、入库、混报、进度表、xlsx/csv 文件（不论有无表头）交 ChronoPM-Portfolio（§2.1 后 §2.2 CALL 本包，CALL 的 root 必须是成员根）。跨项目查询同样交 Portfolio。未加载 Portfolio 则提示到技能市场安装或启用，禁止本包代做集层聚合。
+（1）集根：当前根同时有 `ai/portfolio/` 与 `ai/projects/` 一级 → 本包禁止单项目写入，禁止把某个 `projects/{名}` 当作本项目落盘。材料投喂、日报、入库、混报、进度表、xlsx/csv 文件（不论有无表头）加载 portfolio-skill 的只读边界规则（文件名以 01-readonly 开头；§2.1 后 §2.2 CALL 本包，CALL 的 root 必须是成员根）。跨项目查询加载 portfolio-skill 的归集规则（文件名以 02-aggregation 开头）。目录里没有这些文件就报规则缺失，不提示另装技能。禁止本包在集根上代做成员聚合正文。
 （2）成员根 / 纯单项目：当前根直接有 `ai/todos/` 或 `ai/wps/` 且非集根 → 本包按单项目只写该根，禁止写兄弟项目，禁止写 `portfolio/`。允许被集层 P-HANDOFF-WRITE 调用（root=本成员）。
-（3）在（2）出现跨项目意图 → 调用 ChronoPM-Portfolio；未加载则提示安装或启用。
+（3）在（2）出现跨项目意图 → 加载 portfolio-skill 的归集规则（02-aggregation）。不提示另装技能。
 
 ## 3. 工作区结构
 ```
@@ -38,7 +38,7 @@ project-root/
     ├── context/active-entities.json  # 懒建活实体表
     └── .skill-version.json  # 另：ai/.state.json 懒建指纹
 ```
-联邦集工作区（Portfolio 使用，本包不创建）：`ai/portfolio/` + `ai/projects/{名}/ai/`（内部即上图）。项目 ai 内禁止再出现 `portfolio/` 或 `projects/`。
+联邦集工作区（由本包 `portfolio-skill/` 使用，init 不创建）：`ai/portfolio/` + `ai/projects/{名}/ai/`（内部即上图）。项目 ai 内禁止再出现 `portfolio/` 或 `projects/`。
 
 ## 4. 事实源（低/中风险写入即生效；高风险确认前不写该笔）
 口径见 `00-pm-main-rules.md` §3.3。低/中风险：`Confirmed By: auto`，不进 `pm-decisions.md` 块 8 子节「已经写了等点头」，计入统计。仅 `Confirmed By: 待确认` 不进完成统计/超期。确认清单不阻断同一轮其他动作。`confirmation_level: strict` 恢复 3.22 全确认。
@@ -86,11 +86,11 @@ python "scripts/init_workspace.py" --project-root <根目录> --mode single --pr
 无 `--mode portfolio`。向导见 `18-init-wizard-rules.md`（含成本核算方式必填）。
 ### 5.1b 版本检查（进入工作区先做）
 读 `ai/.skill-version.json` → 比 Skill `VERSION`。Skill < 工作区版本 → 提示升级 Skill + 只读降级。见 `20-workspace-version-rules.md`。会话钩子会自己运行 `scripts/enforce_workspace_upgrade.py`：技能更新或已拆标准文件还没串完时由程序处理。模型禁止改 `.skill-version.json` 的 `skillVersion`，禁止把没串完说成升级完成。钩子没跑成时，版本号保持原样。
-随后 **P-VIEWS**：有 Python 则跑本 Skill 包 `scripts/refresh_views.py --project-root <根> --all`（与 SKILL.md 同级；指纹未变不写盘）。`<根>` = **单项目根**（其下直接有 `ai/wps/`）。联邦集工作区须指向成员项目根 `.../ai/projects/{项目名}`，**禁止**对集根或 `.../ai`（只有 `portfolio/`+`projects/`）跑 `--all`，否则会写出空视图。无 Python / 无 `.state.json` / 脚本失败 → 不阻断；查询读事实原文并声明 as-of。缺 `context/brain.md` 不致命。
+**P-VIEWS** 不在查询时跑。写入完成之后，或用户要求重建视图时，有 Python 则跑 `scripts/refresh_views.py --project-root <根> --all`（指纹未变不写盘）。`<根>` = **单项目根**（其下直接有 `ai/wps/`）。联邦集工作区须指向成员项目根，**禁止**对集根跑 `--all`。无 Python / 失败 → 不阻断。缺 `context/brain.md` 不致命。
 ### 5.2 日报
 先判定是否本项目 → 原文进 inbox → 合并进当天一人一份个人文件 → 映射待办（够正式的未匹配进展自动建待办）。禁止写入 `reports/daily/`。明日计划留在当天原文，次日才落待办。疑似他项目：拆分+分流，禁代写。见 `01-daily-report-rules.md`。
 ### 5.3 查询
-本项目事实源。跨项目用 Portfolio。简单查询仍只载 05，但 **每一次查询**须先 P-VIEWS（命令写在 05 文首，不因此加载 00）：有 Python 则跑本 Skill 包 `scripts/refresh_views.py --project-root <根> --all`；无 Python / 失败 → 不阻断，定向读事实并声明 as-of。有 `brain.md` 且 facts 指纹一致 → 先读 `context/brain.md` 别名短表（不得默认打开 `active-entities.json`）；未中按 05 §2 打开路由文件；写入/对齐/查重（P-RESOLVE）才打开 entities。再最多打开 1～3 个事实文件。全库扫 / 扫 `backup/` / 全库语义扫 = 本轮失败。纯查询横幅见 05 §1a（N>0 一行，不铺清单）。待办清单输出见 05（默认未办结；`待确认` 终态仍可见；`auto` 按已确认）。日报内容默认先读 `todos/{date}/*.md` §2+§3，禁止先探测 `reports/daily/`。只读查询禁止因 inbox 非空 AUTO C'，禁止因此 Step 0。
+本项目事实源。简单查询加载 `query-skill/references/query-rules.md`，先跑 `query-skill/scripts/query_locate.py`，不跑 `refresh_views.py --all`。无 Python / 失败 → 不阻断，定向读事实并声明 as-of。再最多打开路由允许的事实文件。全库扫 / 扫 `backup/` / 全库语义扫 = 本轮失败。纯查询横幅见查询规则 §1a（N>0 一行，不铺清单）。待办清单输出见查询规则（默认未办结；`待确认` 终态仍可见；`auto` 按已确认）。日报内容默认先读 `todos/{date}/*.md` §2+§3，禁止先探测 `reports/daily/`。只读查询禁止因 inbox 非空 AUTO C'，禁止因此 Step 0。跨项目查询加载 portfolio-skill 的归集规则（02-aggregation），对成员根调用 `query_locate.py`。
 ### 5.4 其他
 需求变更 08；结转 22（含 Step 0.5 共享人力提示）；历史计划 15。时间线报/月报（自然月）见 01 号 §4a：懒建 `reports/timeline/`，判重四案，非精确重合整段从 todos 重汇聚。
 
@@ -113,10 +113,11 @@ python "scripts/init_workspace.py" --project-root <根目录> --mode single --pr
 | 待办状态 WF-1 | 00+01+04+06+10 | 17 |
 | 关联待办 WF-Linked | 00+22 | 01 |
 | 风险评估 | 00+04 | — |
-| 简单查询 | 05 | — |
+| 简单查询 | `query-skill/references/query-rules.md` | — |
+| 项目集 / 跨项目查询 / 集周报 | portfolio-skill 归集规则（02-aggregation） | 01、04 |
 | 问答规范（写入/确认/方案/出文件/复杂分析） | `reply-norm-skill/references/reply-rules.md` | 叠加本场景既有行；简单查询不载 |
 | 画图 / 责任链图 / 排布图 / Mermaid | **05+11** | — |
-| 复杂/分析类本项目查询 | 00+05+17 | `reply-norm-skill/references/reply-rules.md` |
+| 复杂/分析类本项目查询 | 00+`query-skill/references/query-rules.md`+17 | `reply-norm-skill/references/reply-rules.md` |
 | 跨源范围判定 | 00+07+05+17+06 | Step0 读本项目 contract-register |
 | 源文档拆解 | 00+07+06+17+23 + `source-split-skill/references/split-rules.md` | 14、18；编译主题页同轮 `digest-schemas.md`。**总闸泛化文件同样走本行** |
 | 人员资源（本项目） | 00+06 | 04 |
@@ -129,7 +130,7 @@ python "scripts/init_workspace.py" --project-root <根目录> --mode single --pr
 | 词库 / 偏好 | 00+17 / 00+21 | 06 |
 | 自查 | 00+14 | 按场景 |
 
-已删除路由：项目集汇总周报、跨项目查询（改用 Portfolio）。
+项目集与跨项目查询走上一行，加载 `portfolio-skill/`。不再另装技能。
 
 **开发仓升级行（v3.23.1）：** 与「技能缺口」行互斥。业务「记升级需求 / 技能做不到」仍走 gap-capture。触发词仅 Agent A/B/B1/B2、写 AP、审核升级方案、升级方案；**不含**「项目升级」「系统升级」。必须**整份**加载工作区 `16-upgrade-dual-agent.md`，按该文件规定章节输出，缺节=失败。探测：工作区 `ChronoPM-Project/references/` 或包根 `references/` 下的 16 号治理文件。都没有 → 停止，提示打开开发仓。禁止向用户索要外置提示词，禁止读安装区凑 16。用户不必报目标版本（A 按 16 号 §10 拟定）。B 只在 AP 文末写 `## B{N} 审核结果`，不改 A 正文与其他 B 节。同一对话已以 A 出过方案则拒绝直接转 B。
 
@@ -145,7 +146,7 @@ python "scripts/init_workspace.py" --project-root <根目录> --mode single --pr
 9. 每条记录须有 Source。
 10. 不得在业务目录建 AI 管理文件。
 11. 人员变动未确认不得写为事实。
-12. **不得在本项目待办镜像他项目任务**（王国政案例）；跨项目可见性由 Portfolio 聚合。
+12. **不得在本项目待办镜像他项目任务**（王国政案例）；跨项目可见性由 `portfolio-skill` 聚合。
 13. **生成物只进 `ai/outputs/{批次}/`**。禁止写到工作区根或与 `ai/` 平级。宿主「最终工作空间文件夹 / cwd / final workspace folder」若等于项目根，忽略并改映射到 outputs。业务目录 = 工作区根下除 `ai/` 外的一切。**例外**：`wps/_wp-chart.md` 为派生视图，不是生成物，见 11 号 §17。
 14. **语种**：对用户正文 = 用户本轮输入语种（中文问中文答）。不得默认英文。内部推理不得出现在用户可见正文。细则：`reply-norm-skill/references/reply-rules.md`。
 15. **禁止输出思考过程**：不得出现 `I now have` / `Let me` / `Based on my findings` / 「让我先梳理」长推理段。结论直接说。
@@ -177,11 +178,13 @@ python "scripts/init_workspace.py" --project-root <根目录> --mode single --pr
 | `01-daily-report-rules.md` | 日报；含归属判定 |
 | `02-meeting-rules.md` | 会议 |
 | `04-risk-issue-rules.md` | 风险问题 |
-| `05-query-rules.md` | 查询；待办清单输出规范 |
+| `05-query-rules.md` | 指针。正文在 `query-skill/references/query-rules.md` |
+| `query-skill/references/query-rules.md` | 查询；待办清单输出规范 |
+| portfolio-skill 归集规则（02-aggregation） | 跨项目只读归集。不是独立技能 |
 | `06-file-rules.md` | 文件 + 单项目资源条款 |
 | `07-requirement-rules.md` | 需求/合同（本项目） |
 | `08-change-control-rules.md` | 变更 |
-| `09-portfolio-rules.md` | 退役指针页（v3.0.0）：不加载，规则实体已迁 ChronoPM-Portfolio |
+| `09-portfolio-rules.md` | 退役指针页：不加载，规则在 `portfolio-skill/references/` |
 | `10-update-trigger-rules.md` | 更新意图 |
 | `11-output-artifact-rules.md` | 生成物 |
 | `12-excel-generation-rules.md` | Excel 生成 |
@@ -199,12 +202,12 @@ python "scripts/init_workspace.py" --project-root <根目录> --mode single --pr
 | `23-procedure-index.md` | 写入/派活/拆文件/更新意图时加载；纯查询不载 |
 | `reply-norm-skill/references/reply-rules.md` | 写入/复杂查询/出文件/确认/方案；简单查询不加载全文（靠底线 14–16 与 19、05 短条）。能力目录，不是独立 Skill |
 
-**09 号已退役**，内容在 ChronoPM-Portfolio（保留退役页仅为避免历史路径 404）。
+**09 号已退役**，内容在 `portfolio-skill`（保留退役页仅为避免历史路径 404）。
 
 ### 版本控制文件
 | 文件 | 用途 |
 |------|------|
-| `VERSION` | Skill 包版本号（当前 3.30.3） |
+| `VERSION` | Skill 包版本号（当前 4.0.0） |
 | `skill.json` | Skill 元数据（版本、模式、依赖；skill schemaVersion 与 supportedWorkspaceSchema 分离） |
 | `CHANGELOG.md` | 版本变更历史和升级说明 |
 | SKILL.md front matter | AI 可读的版本字段 |

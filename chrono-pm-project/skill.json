@@ -1,7 +1,7 @@
 {
   "name": "chrono-pm-project",
-  "displayName": "ChronoPM-Project — 项目管理（日报/待办/合同）",
-  "version": "3.30.3",
+  "displayName": "ChronoPM-Project — 项目管理（日报/待办/计划/风险/周报）",
+  "version": "4.0.0",
   "schemaVersion": "0.7.0",
   "supportedWorkspaceSchema": {
     "min": "0.1.0",
@@ -94,7 +94,7 @@
       "description": "待确认变更索引 pending-changes.md + change-log 分层归档 (CR-20260811-002)"
     }
   ],
-  "description": "给项目经理的 AI 副手。项目管理、项目、工作包、计划、倒排、待办、日报、周报、需求、合同、风险、纪要、进度表、xlsx 入库。写进 Markdown，你确认才算数。项目集/跨项目请安装 ChronoPM-Portfolio。",
+  "description": "项目管理：记日报、出周报、跟待办、做风险登记、写会议纪要。工作包、计划、倒排、里程碑、合同和需求也落在你自己的 Markdown 文件夹里。要紧的变更先问过你。跨项目只读归集在本包的 portfolio-skill/，不是单独安装的技能。Project management for daily reports, weekly reports, todos, risk registers, and meeting notes, stored in your own Markdown folder. Material changes wait for your confirmation. Cross-project read-only rollups are the in-package portfolio-skill.",
   "modes": [
     "single"
   ],
@@ -107,6 +107,11 @@
     "python": ">=3.9"
   },
   "versionHistory": [
+    {
+      "version": "4.0.0",
+      "date": "2026-09-23",
+      "summary": "查询与项目集收进能力目录；单文件版本戳；不再发行 Portfolio 包。"
+    },
     {
       "version": "3.30.3",
       "date": "2026-09-22",
@@ -594,8 +599,8 @@
     }
   ],
   "blueprint": {
-    "lastUpdated": "2026-09-22",
-    "lastVersion": "3.30.3",
+    "lastUpdated": "2026-09-23",
+    "lastVersion": "4.0.0",
     "updateRequiredOn": [
       "major",
       "minor",

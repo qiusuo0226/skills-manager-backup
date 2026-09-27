@@ -1,6 +1,30 @@
 # Changelog
 
-本文件记录 ChronoPM Skill 的版本变更历史。版本号遵循语义化版本（MAJOR.MINOR.PATCH）。v3.0.0 起 ChronoPM-Project 与 ChronoPM-Portfolio 共用同一条版本线。
+本文件记录 ChronoPM Skill 的版本变更历史。版本号遵循语义化版本（MAJOR.MINOR.PATCH）。4.0.0 起只发行 ChronoPM-Project。3.0.0 至 3.30.3 曾与 ChronoPM-Portfolio 共用版本线。
+
+---
+
+## 4.0.0 — 2026-09-23
+
+> Major。查询与项目集收进 ChronoPM-Project。查询只哈希命中文件。说法并成一张表，没并完不盖戳。schema **0.17.0** 不变。不再发行 Portfolio 包。回归 **1041**。
+
+Blueprint Impact: full
+
+### Changed
+- 新增 `query-skill/`、`portfolio-skill/`。仓库根删除独立的 ChronoPM-Portfolio
+- `query_locate.py`：说法匹配、单文件戳、`--register`、`--fill-path`、`--flush-heat`
+- 说法表拆成两张各 7 列的表，禁止单表超过 7 列
+- `migrate_workspace.py` 增加 `needs_v400` 与 `VERSION_CAPABILITIES` 的 4.0.0 条目
+- 集根不再提示另装技能。打包与审计改为单包
+
+### 不做
+- 升 schema；新建 `ai/wiki/`；口语说法进入范围登记枚举；把所有写入收成脚本；代更 Grok；本轮写入业务仓
+
+### 收尾补记（2026-09-26，不另起版本）
+- 用户指示收尾技能包。Grok 安装区不代更。业务仓未代迁：市监集根和三个成员的版本戳仍是 3.30.2，不得称这些工作区已升到 4.0.0。
+- 市场描述改为中英对照，埋入项目管理、日报、周报、待办、风险登记、会议纪要。跨项目写成包内 `portfolio-skill/`。去掉「另配 ChronoPM-Portfolio」。
+- schema 仍 0.17.0。audit 17/17。回归 **1041**。tag `v4.0.0` 指向本提交；此前指向 `0e74e3d` 的同名标签已删。基线 `baselines/4.0.0/`，只有 Project 树。
+- 分发包在 Downloads：`ChronoPM-Project-Skill-v4.0.0.zip`（158）。不再另发 Portfolio 包。README 发布产物已是 v4.0.0。
 
 ---
 

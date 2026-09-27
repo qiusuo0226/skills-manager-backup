@@ -121,7 +121,7 @@ ai/context/
 | 里程碑 | `selective_import` | `project-info/progress-plan.md` |
 | 预算/P&L | `selective_import` | `project-info/budget.md` |
 | 人员资源 | `selective_import` | 当天/最新合法日 `todos/{date}/_index.md` **§1 花名册**（本项目待办体系；导入后应建档名单若当日读/写 todos 则建档，§1 可空；已出组不建） |
-| 人员流转 | `selective_import` | 有待办者个人 **§0.5**；无待办者只记花名册状态/备注（本项目；跨项目流转请到 ChronoPM-Portfolio） |
+| 人员流转 | `selective_import` | 有待办者个人 **§0.5**；无待办者只记花名册状态/备注（本项目；跨项目流转由本包 `portfolio-skill/` 承载） |
 | 经验教训 | `summarize_merge` | `reviews/lessons-learned.md` |
 | 周报/月报 | `reference_only` + 摘要 | `context/delta-analysis.md` |
 | 日报 | `reference_only` | 一般不导入 |
@@ -234,7 +234,7 @@ ai/context/
 
 ## 14. 衔接落点（本项目）
 
-历史阶段一律导入本项目 `ai/` 下对应目录（`context/`、`requirements/`、`resources/` 等）。本包不写 `portfolio/`，不把历史拆入 `projects/{子项目}/`。跨项目谱系/多 ai 串联请到 ChronoPM-Portfolio。历史项目名与当前不一致 → 在本项目 `context/project-lineage.md` 建映射。
+历史阶段一律导入本项目 `ai/` 下对应目录（`context/`、`requirements/`、`resources/` 等）。本包不写 `portfolio/`，不把历史拆入 `projects/{子项目}/`。跨项目谱系/多 ai 串联由本包 `portfolio-skill/` 承载。历史项目名与当前不一致 → 在本项目 `context/project-lineage.md` 建映射。
 
 ---
 
@@ -278,5 +278,5 @@ ai/context/
 | `06-file-rules.md` | 不可覆盖规则、context/（原 continuity/）目录管理 |
 | `05-query-rules.md` | 历史/遗留事项查询路由 |
 | `11-output-artifact-rules.md` | 阶段衔接报告输出到 ai/outputs/ |
-| ChronoPM-Portfolio | 跨项目资源/里程碑衔接（09 号已退役；本包不写集层） |
+| `portfolio-skill/` | 跨项目资源/里程碑衔接（09 号已退役；本包不写集层） |
 | `15-snapshot-rules.md` | R1 计划批量导入（external_import）的执行方 |

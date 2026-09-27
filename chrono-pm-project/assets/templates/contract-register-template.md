@@ -31,7 +31,7 @@
 
 ## RI 关联
 
-- **存储归属**：ATOM/Canonical 一律存本项目 `requirements/`（canonical + atoms）；跨项目检索由 ChronoPM-Portfolio 遍历，本 Skill 不在项目 ai 内建 `portfolio/`。
+- **存储归属**：ATOM/Canonical 一律存本项目 `requirements/`（canonical + atoms）；跨项目检索由本包 `portfolio-skill/` 遍历，本 Skill 不在项目 ai 内建 `portfolio/`。
 - **检索路由**：RI 范围判定先读本登记册（Step0），依据 scope_level 与 parent_contract_id 定位本项目 canonical。
 - **文档簇**：Contract ID 通过关联招投标/立项/密评与拆解文件夹指针形成文档簇，跨源检索时先定位合同再路由。
 - **合同变更**：合同拆分/范围调整时维护 status/superseded_by 血缘，并联动 ATOM/Canonical（见 07 号 §8.9.4）。
