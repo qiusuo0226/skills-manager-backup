@@ -1,8 +1,8 @@
 # Skill 开发工具包（skill-devkit）
 
-**空仓一次初始化，或收编已有无规范技能：版本控制、冻结基线、升级记录、变更门禁、触发词、一键打包、发布审计（含结构校验）。问完即落盘，本包退场。**
+**从空文件夹新建技能仓库，或接管（收编）已有但还没管起来的技能：版本控制、冻结基线、升级记录、变更门禁、触发词、一键打包、发布审计（含结构校验）。问完即落盘；之后升级按那个仓自己写好的规则走。**
 
-> Empty-folder initializer, or one-time adopt of an existing ungoverned skill. One conversation writes a self-releasing skill repo, then this kit exits.
+> Set up a new Agent Skill repo from an empty folder, or take over an existing skill that has no versioning or rules yet. One conversation writes a self-releasing skill repo; future upgrades follow that repo's own rules.
 
 给 Skill 作者。装进助手，工作区指到空文件夹说「初始化 skill」，或指到已有无规范技能说「收编这个 skill」。一次对话写入：
 
@@ -13,7 +13,7 @@
 - **触发词** — 写进 `SKILL.md` description，助手才唤得起
 - **一键打包 / 发布审计** — zip 不含治理目录；版本不一致、说明缺项、引用断裂不准发
 
-**写完本包就退场。** 之后升版本、打基线、打 zip，走这个文件夹自己的文件，不再经过本包。
+**建好之后不再经过本包。** 升版本、打基线、打 zip，走这个文件夹自己的文件。
 
 ## 和一篇 SKILL.md 脚手架差在哪
 
@@ -70,10 +70,10 @@ flowchart LR
 | **变更门禁** | `governance/rules/skill-governance.md`、`upgrade-dual-agent.md` | A 出七章 AP；人直接执行，或 B 只追加审核后再由人执行。人要求时按核对单对账实际改动 |
 | **技能缺口** | `references/gap-capture.md`、`outputs/skill-gaps/` | 明示「记成升级需求」先写后告知；不改正文；稿不进安装包 |
 | **影响分析** | `governance/impact-analysis/` | 标契约层 / 规则层是否受影响 |
-| **回归报告** | `tests/`、`governance/regression-reports/` | 正 / 反 / 旧能力各至少一条 |
+| **回归报告** | `tests/`、`governance/regression-reports/` | 每版同一组固定四问（装得上 / 唤得起 / 答得对 / 说得清）对照上一版，外加正 / 反 / 旧能力各至少一条 |
 | **打包发包** | `governance/pack/pack.py`、`pack.ini` | `{英文名}-Skill-v{版本}.zip`；不含治理目录 |
 | **发布审计** | `audit_release.py`、发布核对清单 | 版本一致、有基线、包内无治理目录 |
-| **结构校验** | `validate_skill.py`（audit 先跑） | frontmatter 必填、`references/` 引用存在、VERSION 与 skill.json 一致 |
+| **结构校验** | `validate_skill.py`（audit 先跑） | frontmatter 必填、`references/` 引用存在、VERSION 与 skill.json 一致、触发词三处一致、分发集无上一版号；每条规则有单点变异自测 |
 | **升级方案** | `governance/planning/upgrade-plan-v{版本}.md` | 每周期 1 个 AP；发布后删除 |
 | **一键脚本** | `governance/dev.ps1` | `sync` / `snapshot` / `audit` / `validate` / `pack` / `release` |
 | **仓骨架** | `SKILL.md`、`references/`、`LICENSE`、`README.md` | 可安装的 Skill 入口 |
@@ -118,7 +118,7 @@ flowchart LR
 | （初始化之后）「这版不行，回到上一版」 | 同上：回滚 |
 | （初始化之后）「装到助手里试用」 | 同上：你开口才拷 |
 
-同义口令：`开发一个 skill`、`新建技能`、`从零写 skill`、`脚手架`、`init skill`、`/init-skill`、`/new-skill`；收编：`收编这个 skill`、`adopt skill`、`/skill-devkit adopt`。
+触发：`初始化技能仓库`、`初始化技能`、`初始化skill`、`新建一个技能`、`新建skill`、`创建技能`、`创建skill`、`开发一个技能`、`开发一个skill`、`帮我做个skill`、`建个skill仓库`、`把这个技能管起来`、`接管这个技能`、`收编这个skill`、`init skill`、`adopt skill`、`/skill-devkit`、`/init-skill`、`/new-skill`、`/skill-devkit adopt`。与 `SKILL.md` 说明里的触发段相同（发版检查会比对）；更多同义说法（如「从零写skill」「脚手架skill」「scaffold skill」）见 `references/04-triggers.md`。
 
 ## 快速开始
 
