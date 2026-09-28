@@ -1,7 +1,7 @@
 {
   "name": "chrono-pm-project",
   "displayName": "ChronoPM-Project — 项目管理（日报/待办/计划/风险/周报）",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "schemaVersion": "0.7.0",
   "supportedWorkspaceSchema": {
     "min": "0.1.0",
@@ -107,6 +107,11 @@
     "python": ">=3.9"
   },
   "versionHistory": [
+    {
+      "version": "4.0.1",
+      "date": "2026-09-28",
+      "summary": "Patch：已拆源可声明 reference，不计缺口；摘要页写参见；口述日报进待办，日报文件和开会文件拆档；出文件前做路径裁决。schema 保持 0.17.0。回归 1072。"
+    },
     {
       "version": "4.0.0",
       "date": "2026-09-23",
@@ -599,8 +604,8 @@
     }
   ],
   "blueprint": {
-    "lastUpdated": "2026-09-23",
-    "lastVersion": "4.0.0",
+    "lastUpdated": "2026-09-28",
+    "lastVersion": "4.0.1",
     "updateRequiredOn": [
       "major",
       "minor",

@@ -114,6 +114,19 @@ ai/outputs/{YYYYMMDDHHMMSS}/
 
 ---
 
+<!-- output-path-policy:start -->
+| 裁决 | 落点 |
+|---|---|
+| ALLOW | `ai/outputs/` |
+| ALLOW | `ai/wps/_wp-chart.md` |
+| REMAP | `workspace-root-file` |
+| REMAP | `beside-ai` |
+| DENY | `outside-workspace` |
+| DENY | `ai-fact-source` |
+<!-- output-path-policy:end -->
+
+出文件前运行 `scripts/check_output_path.py --root <项目根> --path <候选路径>`。退出码 0 用该路径。退出码 2 改用打印出的 `ai/outputs/{批次}/` 路径。退出码 3 停止并说明被拒绝。事实源写入不跑这个脚本。标记缺失或没有可用裁决行时，脚本拒绝。
+
 ## 8. 来源追溯
 
 除 `Type=skill_gap` 外，所有生成物必须在 `manifest.md` 中记录来源文件（如本项目周报来自本项目日报/待办/风险/问题等）。skill_gap 的来源写在需求文件 YAML `source_files`。跨项目汇总周报由本包 `portfolio-skill/` 承载，本包不以其为归档目标。**不得生成无来源记录的正式文件。**

@@ -22,11 +22,11 @@
 | P-PLAN-SYNC | 计划→WP | 00 §4b | — | — | WP 时间盒+计划投影 | 灌 todos |
 | P-CARRY | 结转 | 22 | 先快扫三问（22 §2.1；只读当天 `_index` + 文件名） | 三问未过才跑本 Skill 包 `scripts/carryover_step0.py --root <项目根>`（禁止在 ai/ 或业务 cwd 找）；再 P-CARRY-WPREF（脚本已高置信回填则跳过） | 当日文件 | 快扫阶段跑脚本；快扫阶段加载 22 全文；改编号、改历史行；exit 0 后手搓全员；`FAIL:ROSTER_EMPTY` 仍手搓 |
 | P-CARRY-WPREF | 结转 WP Ref | 22 §5 | — | P-WF8-CARD | 仅空值高置信回填 | 猜填；改已有合法归属；无 WP 结转到今天核心表 |
-| P-SPLIT | 源文档拆解 | `source-split-skill/references/split-rules.md` | 指纹查重 | 07 REQ 上提（不落待办）；能抽则抽佐证图；**协调者收尾编译** `_digest.md`（加载 digest-schemas） | `requirements/sources/{编号}/` 六件套 + 可选 figures/ | 用 outputs HTML 替代；二次拆解；会议转写/纪要当源文档；源图写入 artifacts/；原型截图写入 figures/；手改 digest 当纠偏；digest 当价款唯一证据；`[[wikilink]]`；主题页进 outputs/ |
-| P-DOC-INGEST | 拆文件分发 | 10 源文档信号 **或** §1.0 总闸通过且未命中约定类的可读文件 + SKILL 路由 | 读 project-brief | 会议转写/纪要/例会导出 → WF-3，**禁止 CALL P-SPLIT**；其余 **必须 CALL P-SPLIT**（无条款走薄源）；若还要报告再 P-OUTPUT | sources/ 或 meetings/ | 只出报告不入库；会议误进 sources；因「不在 L2 表」反问 |
+| P-SPLIT | 源文档拆解 | `source-split-skill/references/split-rules.md` | 指纹查重 | 07 REQ 上提（不落待办）；能抽则抽佐证图；**协调者收尾编译** `_digest.md`（加载 digest-schemas） | `requirements/sources/{编号}/` 六件套 + 可选 figures/ | 用 outputs HTML 替代；二次拆解；没有文件的会议转写当源文档；源图写入 artifacts/；原型截图写入 figures/；手改 digest 当纠偏；digest 当价款唯一证据；`[[wikilink]]`；主题页进 outputs/ |
+| P-DOC-INGEST | 拆文件分发 | 10 源文档信号 **或** §1.0 总闸通过且未命中约定类的可读文件 + SKILL 路由 | 读 project-brief | 没有文件的会议转写 → WF-3，**禁止 CALL P-SPLIT**；甩来的开会文件或日报文件 → WF-3 或 01，并且 **CALL P-SPLIT**（`doc_kind: reference`）；其余 **必须 CALL P-SPLIT**（无条款走薄源）；若还要报告再 P-OUTPUT。出文件前先跑 `scripts/check_output_path.py` | sources/ 或 meetings/ | 只出报告不入库；没有文件的会议误进 sources；因「不在 L2 表」反问 |
 | P-REQ-DECOMP | 需求拆解 | 07 §3 | — | — | 需求清单 | 落待办；与 P-SPLIT 混淆 |
 | P-REQ-WP | REQ↔WP | 07 | — | — | 登记册工作包列 / WP §2 | 需求正文抄进 WP |
-| P-OUTPUT | 生成物 | 11 | P-ALWAYS 三路 | — | `ai/outputs/{批次}/` | 当事实源；替代 P-SPLIT |
+| P-OUTPUT | 生成物 | 11 | P-ALWAYS 三路；先跑 `scripts/check_output_path.py` | 退出码 2 改用打印路径；退出码 3 停止 | `ai/outputs/{批次}/` | 当事实源；替代 P-SPLIT；不跑校验器就落盘 |
 | P-RI | 跨源范围判定 | 07 §8 | — | 可读 sources 索引 | 不新建源目录 | 把范围判定当成拆文件 |
 | P-WP-SCAN | 待办聚人期 | 00 §8d | effect=正常 | 投影正常计划 §3 行+§4 该 WP 段；同回合 §8b | WP §8 (AI聚合)+§8b | 覆盖点名；全库扫；改 WP 整包窗；清空已冻结 ✅ 人期；改人期不写 8b；**写 §3c** |
 | P-WP-ADVANCE | 建议推进链 | 00 §8d | PM 确认 | SCAN 可选 | §7 只追加 | 改旧链行；自动写链；effect=废弃仍推 |
@@ -48,7 +48,7 @@ P-ROUTE
  ├─ 用户纠偏 → P-CORRECT → P-VIEWS
  ├─ 派活/加待办 → P-WF8 → P-CARRY → P-CARRY-WPREF → P-RESOLVE → P-WF8-DEDUP → (P-WF8-SPLIT) → P-WF8-CARD → P-BOX
  ├─ 改计划排期 → P-PLAN-SYNC →（WP 窗变）P-WP-BOX-CHK →（越界）P-BOX
- ├─ 会议转写/纪要/例会导出 → WF-3（先 meetings/，T-A4 才 P-CARRY）；禁止 CALL P-SPLIT
+ ├─ 会议转写/纪要/例会导出 → WF-3（先 meetings/，T-A4 才 P-CARRY）。无文件禁止 CALL P-SPLIT。甩来的开会文件同轮 P-SPLIT（保留「除非用户明示拆进 sources/」）
  ├─ 拆文件/拆文档/入库源文档 → P-DOC-INGEST → P-SPLIT → P-REQ-WP
  │                              └─（仅当还要对外文件）P-OUTPUT
  ├─ 拆解需求（无源文件） → P-REQ-DECOMP
@@ -59,7 +59,7 @@ P-ROUTE
  ├─ 待办办结/敲定 → P-WP-STAMP
  ├─ 新建/改/完成归档/废弃 WP → P-WP-CHART
  ├─ 功能点阶段全齐 → P-WP-ALIGN
- ├─ 技能缺口 → P-SKILL-GAP → P-OUTPUT
+ ├─ 技能缺口 → P-SKILL-GAP → P-OUTPUT（与「生成报告/导出」同现时走本行）
  ├─ 集层手递 → P-HANDOFF-ACCEPT →（按切片）01 inbox / 01 人员口径 / 04 / P-SPLIT / 07 §8.9 / 01 §1.6
  └─ 对外回复（写入/确认/方案/出文件/复杂分析） → P-REPLY
 ```

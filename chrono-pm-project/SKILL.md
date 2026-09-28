@@ -1,8 +1,8 @@
 ---
 name: chrono-pm-project
-version: 4.0.0
+version: 4.0.1
 schema_version: 0.17.0
-updated_at: 2026-09-23
+updated_at: 2026-09-28
 description: 项目管理：记日报、出周报、跟待办、做风险登记、写会议纪要。工作包、计划、倒排、里程碑、合同和需求写进你自己的 Markdown 文件夹；要紧的变更先问过你。跨项目只读归集在本包的 portfolio-skill/，不是单独安装的技能。Project management for daily reports, weekly reports, todos, risk registers, and meeting notes in your own Markdown folder. Material changes wait for your confirmation. Cross-project read-only rollups are the in-package portfolio-skill. 触发：项目管理、项目、项目集、组合、跨项目、初始化项目、工作包、WP、计划、看计划、排计划、倒排、排期、阶段、里程碑、门禁、结转、派活、待办、任务、进度、需求、变更、范围、合同、合同登记、风险登记、风险、问题、决策、会议、会议纪要、纪要、拆文件、源文档、工时、能耗、人员、花名册、人员进出、进度表、xlsx、csv、投喂、粘贴、入库、归档、更新、补全、回填、评审、验收、成本、预算、复盘、历史计划、完整性巡检、词库、偏好、画图、责任链图、记日报、日报、出周报、周报、集周报、ChronoPM、ChronoPM-Project、daily report、todo、task、work package、plan、schedule、milestone、risk register、risk、issue、meeting notes、weekly report、contract、requirement、portfolio、cross-project。集层规则在 portfolio-skill，查询规则在 query-skill。
 ---
 # ChronoPM-Project — 项目管理（日报/待办/计划/风险/周报）
@@ -85,24 +85,24 @@ python "scripts/init_workspace.py" --project-root <根目录> --mode single --pr
 ```
 无 `--mode portfolio`。向导见 `18-init-wizard-rules.md`（含成本核算方式必填）。
 ### 5.1b 版本检查（进入工作区先做）
-读 `ai/.skill-version.json` → 比 Skill `VERSION`。Skill < 工作区版本 → 提示升级 Skill + 只读降级。见 `20-workspace-version-rules.md`。会话钩子会自己运行 `scripts/enforce_workspace_upgrade.py`：技能更新或已拆标准文件还没串完时由程序处理。模型禁止改 `.skill-version.json` 的 `skillVersion`，禁止把没串完说成升级完成。钩子没跑成时，版本号保持原样。
+读 `ai/.skill-version.json` → 比 Skill `VERSION`。Skill < 工作区版本 → 提示升级 Skill + 只读降级。见 `20-workspace-version-rules.md`。会话钩子会自己运行 `scripts/enforce_workspace_upgrade.py`：技能更新或已拆的需求类标准文件还没串完时由程序处理。已声明 `doc_kind: reference` 的切片不计入这条未完成。模型禁止改 `.skill-version.json` 的 `skillVersion`，禁止把没串完说成升级完成。钩子没跑成时，版本号保持原样。
 **P-VIEWS** 不在查询时跑。写入完成之后，或用户要求重建视图时，有 Python 则跑 `scripts/refresh_views.py --project-root <根> --all`（指纹未变不写盘）。`<根>` = **单项目根**（其下直接有 `ai/wps/`）。联邦集工作区须指向成员项目根，**禁止**对集根跑 `--all`。无 Python / 失败 → 不阻断。缺 `context/brain.md` 不致命。
 ### 5.2 日报
-先判定是否本项目 → 原文进 inbox → 合并进当天一人一份个人文件 → 映射待办（够正式的未匹配进展自动建待办）。禁止写入 `reports/daily/`。明日计划留在当天原文，次日才落待办。疑似他项目：拆分+分流，禁代写。见 `01-daily-report-rules.md`。
+先判定是否本项目 → 原文进 inbox → 合并进当天一人一份个人文件 → 映射待办（够正式的未匹配进展自动建待办）。禁止写入 `reports/daily/`。明日计划留在当天原文，次日才落待办。口述或粘贴不建 `sources/`。甩来的日报文件同轮拆进 `sources/`，`doc_kind: reference`，进展仍进各人当天待办。疑似他项目：拆分+分流，禁代写。见 `01-daily-report-rules.md`。
 ### 5.3 查询
 本项目事实源。简单查询加载 `query-skill/references/query-rules.md`，先跑 `query-skill/scripts/query_locate.py`，不跑 `refresh_views.py --all`。无 Python / 失败 → 不阻断，定向读事实并声明 as-of。再最多打开路由允许的事实文件。全库扫 / 扫 `backup/` / 全库语义扫 = 本轮失败。纯查询横幅见查询规则 §1a（N>0 一行，不铺清单）。待办清单输出见查询规则（默认未办结；`待确认` 终态仍可见；`auto` 按已确认）。日报内容默认先读 `todos/{date}/*.md` §2+§3，禁止先探测 `reports/daily/`。只读查询禁止因 inbox 非空 AUTO C'，禁止因此 Step 0。跨项目查询加载 portfolio-skill 的归集规则（02-aggregation），对成员根调用 `query_locate.py`。
 ### 5.4 其他
 需求变更 08；结转 22（含 Step 0.5 共享人力提示）；历史计划 15。时间线报/月报（自然月）见 01 号 §4a：懒建 `reports/timeline/`，判重四案，非精确重合整段从 todos 重汇聚。
 
 ## 6. 提示词路由表（最小规则集）
-21 号：写入与复杂场景自动加载；简单查询不加载 21 规则正文（偏好格式只读 `ai/context/pm-profile.md`）。WF-8 新建待办 = 00+22+21+06+23。命中拆文件/拆文档 → 改走「源文档拆解」行，禁止只走「更新意图」。**命中会议转写/纪要/例会导出 → 走会议纪要行，禁止改走源文档拆解**（除非用户明示拆进 `sources/`）。WP 状态历史见 00。词库感应见 17 §8.4。过程签名见 23（纯查询不载）。问答规范：写入/确认/方案/出文件/复杂分析叠加加载 `reply-norm-skill/references/reply-rules.md`；简单查询不加载该全文（靠底线 14–16 与 19、05 短条）。`reply-norm-skill/` 是能力目录，不是独立 Skill，禁止宿主扫成第二个 Skill。
+21 号：写入与复杂场景自动加载；简单查询不加载 21 规则正文（偏好格式只读 `ai/context/pm-profile.md`）。WF-8 新建待办 = 00+22+21+06+23。命中拆文件/拆文档 → 改走「源文档拆解」行，禁止只走「更新意图」。**命中会议转写/纪要/例会导出 → 走会议纪要行，禁止改走源文档拆解**（除非用户明示拆进 `sources/`，或甩来了独立的开会文件）。甩来的开会文件同轮拆进 `sources/`，`doc_kind: reference`，行动项仍按会议规则提取。无文件的转写不进 `sources/`。WP 状态历史见 00。词库感应见 17 §8.4。过程签名见 23（纯查询不载）。问答规范：写入/确认/方案/出文件/复杂分析叠加加载 `reply-norm-skill/references/reply-rules.md`；简单查询不加载该全文（靠底线 14–16 与 19、05 短条）。`reply-norm-skill/` 是能力目录，不是独立 Skill，禁止宿主扫成第二个 Skill。
 
 | 场景 | 必须加载 | 可选 |
 |------|----------|------|
 | 初始化向导 | 00+06+18 | — |
 | 完整性巡检 | 00+06+19 | 01/02/04-08 |
 | 日报 | 00+01+06+17+22 | 04、07、10 |
-| 会议纪要 | 00+02+06+17 | 04、07、08。命中会议转写/纪要/例会导出禁止改走源文档拆解 |
+| 会议纪要 | 00+02+06+17 | 04、07、08。无文件的转写禁止改走源文档拆解。甩来的开会文件同轮拆档，并保留「除非用户明示拆进 `sources/`」 |
 | 需求评审/变更 | 00+07+08+06 | — |
 | 待办文件更新 | 00+06+23 | 10 |
 | 待办创建 WF-8 | 00+22+21+06+23 | 01、02、07、08、10 |
@@ -132,6 +132,8 @@ python "scripts/init_workspace.py" --project-root <根目录> --mode single --pr
 
 项目集与跨项目查询走上一行，加载 `portfolio-skill/`。不再另装技能。
 
+用户要的是升级需求、技能缺口或 skill 需求时，即使句子里有生成、写、出、整理，也走「技能缺口」行，不走「生成报告/导出」行。技能缺口行内部仍按 23 号 CALL P-OUTPUT，主文件名是 `需求-{短标题}.md`。宿主技能自己的输出目录不得覆盖底线 13。
+
 **开发仓升级行（v3.23.1）：** 与「技能缺口」行互斥。业务「记升级需求 / 技能做不到」仍走 gap-capture。触发词仅 Agent A/B/B1/B2、写 AP、审核升级方案、升级方案；**不含**「项目升级」「系统升级」。必须**整份**加载工作区 `16-upgrade-dual-agent.md`，按该文件规定章节输出，缺节=失败。探测：工作区 `ChronoPM-Project/references/` 或包根 `references/` 下的 16 号治理文件。都没有 → 停止，提示打开开发仓。禁止向用户索要外置提示词，禁止读安装区凑 16。用户不必报目标版本（A 按 16 号 §10 拟定）。B 只在 AP 文末写 `## B{N} 审核结果`，不改 A 正文与其他 B 节。同一对话已以 A 出过方案则拒绝直接转 B。
 
 ## 7. 安全底线
@@ -147,7 +149,7 @@ python "scripts/init_workspace.py" --project-root <根目录> --mode single --pr
 10. 不得在业务目录建 AI 管理文件。
 11. 人员变动未确认不得写为事实。
 12. **不得在本项目待办镜像他项目任务**（王国政案例）；跨项目可见性由 `portfolio-skill` 聚合。
-13. **生成物只进 `ai/outputs/{批次}/`**。禁止写到工作区根或与 `ai/` 平级。宿主「最终工作空间文件夹 / cwd / final workspace folder」若等于项目根，忽略并改映射到 outputs。业务目录 = 工作区根下除 `ai/` 外的一切。**例外**：`wps/_wp-chart.md` 为派生视图，不是生成物，见 11 号 §17。
+13. **生成物只进 `ai/outputs/{批次}/`**。禁止写到工作区根或与 `ai/` 平级。宿主「最终工作空间文件夹 / cwd / final workspace folder」若等于项目根，忽略并改映射到 outputs。业务目录 = 工作区根下除 `ai/` 外的一切。**例外**：`wps/_wp-chart.md` 为派生视图，不是生成物，见 11 号 §17。宿主最终工作空间文件夹约定与底线 13 冲突时底线 13 优先，校验器为最终裁决。出文件前运行 `scripts/check_output_path.py`。
 14. **语种**：对用户正文 = 用户本轮输入语种（中文问中文答）。不得默认英文。内部推理不得出现在用户可见正文。细则：`reply-norm-skill/references/reply-rules.md`。
 15. **禁止输出思考过程**：不得出现 `I now have` / `Let me` / `Based on my findings` / 「让我先梳理」长推理段。结论直接说。
 16. **禁止假执行门**：查询、汇报进度、只读分析 **不准**问「是否执行此方案 / 是否基于文档继续执行 / 要不要按这个 plan 做」。**已判定与本项目相关的材料**不准问「您希望我怎么做 / 需要我如何处理 / 要不要记住 / 要不要解析」。用户没要方案就不要造方案确认。真确认才走 00 §5.0。
@@ -207,7 +209,7 @@ python "scripts/init_workspace.py" --project-root <根目录> --mode single --pr
 ### 版本控制文件
 | 文件 | 用途 |
 |------|------|
-| `VERSION` | Skill 包版本号（当前 4.0.0） |
+| `VERSION` | Skill 包版本号（当前 4.0.1） |
 | `skill.json` | Skill 元数据（版本、模式、依赖；skill schemaVersion 与 supportedWorkspaceSchema 分离） |
 | `CHANGELOG.md` | 版本变更历史和升级说明 |
 | SKILL.md front matter | AI 可读的版本字段 |

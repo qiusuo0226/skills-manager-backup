@@ -1661,6 +1661,44 @@
 | QV-012 | 废弃工作包有后继 | 别名行指向后继 | regression |
 | QV-013 | 只跑 --flush-heat | 热度增加，说法表有效戳不变 | regression |
 
+## 97. 非需求豁免与出文件路径（v4.0.1 CR-20260928-001）
+
+施工只认合计 **1072**（1041+31）。禁止沿用 1041。需求类未串完仍不得改 skillVersion。`doc_kind: reference` 不计缺口。
+
+| Case ID | Input | Expected | Type |
+|---|---|---|---|
+| DK-001 | reference，有 atoms，无需求 | 退出码 0；已绑为非需求类；迁移日志不变 | positive |
+| DK-002 | 不写 doc_kind，有 atoms，无需求 | 缺口「没有可确定的需求」；退出码 1 | regression |
+| DK-003 | requirement，唯一需求且有工包 | 退出码 0；已绑含两个编号 | regression |
+| DK-004 | requirement，零条需求 | 仍记缺口；退出码 1 | negative |
+| DK-005 | reference，候选需求多于一条 | 退出码 0；不出现「同时对上好几条需求」 | positive |
+| DK-006 | doc_kind 为其他词 | 缺口「doc_kind 无法识别」 | negative |
+| DK-007 | reference 连跑两次 | 摘要页与两份日志都不增长 | regression |
+| DK-008 | --check 与正式跑 | 只有 --check 打印 REFERENCE {sid}（豁免） | regression |
+| DK-009 | 集根 | 仍 REFUSE | regression |
+| DK-010 | reference，只有 facts.md | 写出摘要页；退出码 0 | positive |
+| DK-011 | requirement，无 atoms | 失败；不写空页 | negative |
+| DK-012 | reference | 需求登记册字节不变 | regression |
+| DK-013 | reference 正文写了已存在的 SRC-002 | 参见含 SRC-002；已绑仍是非需求类 | positive |
+| DK-014 | 正文写了不存在的 SRC-999 | 参见里没有 SRC-999；不新建目录 | regression |
+| DK-015 | 两份 reference 标题完全相同 | 彼此出现在参见里；不记需求缺口 | positive |
+| DK-016 | 需求类已绑 REQ/WP，正文写了已存在的 SRC-002 | 已绑仍是 REQ 与 WP；参见含 SRC-002 | regression |
+| DK-017 | A 的正文引用 B；B 的摘要页是上一轮留下的 | A 的参见含 B | positive |
+| DK-018 | reference，同时有 atoms 和 facts | 退出码 0；不查需求；切片索引仍列出 atoms | positive |
+| PV-001 | ai/outputs/ 下文件 | 退出码 0 | positive |
+| PV-002 | 工作区根上的文件 | 退出码 2，打印 outputs 建议路径 | positive |
+| PV-003 | 工作区以外 | 退出码 3 | negative |
+| PV-004 | ai/requirements/ 下文件当出文件目标 | 退出码 3 | negative |
+| PV-005 | ai/wps/_wp-chart.md | 退出码 0 | positive |
+| PV-006 | 与 ai/ 同级的文件 | 退出码 2 | positive |
+| PV-007 | 11 号缺少裁决标记 | 退出码 3 | regression |
+| PV-008 | 11 号标记在，里面没有可用裁决行 | 退出码 3 | regression |
+| RT-001 | 读 SKILL.md 与缺口规则 | 同现走技能缺口行，并点名「生成报告/导出」行；含底线 13 末句 | regression |
+| DR-101 | 口述或粘贴一段日报 | 只进该人当天待办；不建 sources/ | regression |
+| DR-102 | 甩来一份日报文件 | 建成 sources/，doc_kind=reference；进展仍进各人当天待办 | positive |
+| MT-101 | 甩来一份会议文件 | 建成 sources/，doc_kind=reference；行动项仍进待办 | positive |
+| MT-102 | 粘贴会议转写，没有文件 | 只走会议纪要；不建 sources/ | regression |
+
 ## 回归用例统计
 
 | 模块 | 用例数 | 正向 | 回归 |
@@ -1761,4 +1799,5 @@
 | 升级存量闸 (94) | 8 | 2 | 6 |
 | 升级执行程序强制 (95) | 17 | 6 | 11 |
 | 查询定位与单包 (96) | 13 | 3 | 10 |
-| **合计** | **1041** | **587** | **454** |
+| 非需求豁免与出文件路径 (97) | 31 | 13 | 18 |
+| **合计** | **1072** | **600** | **472** |

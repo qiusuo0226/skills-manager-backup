@@ -126,6 +126,7 @@ Skill 包根 = 与 `SKILL.md` 同级。CQ-5：禁对话记忆当证据。
 | TD 编号反查 | "TD-CJJ-20260820-001 是谁的？""TD-SJJ-xxx" | 最新合法日 `todos/{date}/_index.md` **§6 TD 缩写映射**（双键：先匹配现行缩写，未中再匹配历史别名）；命中后读该人 todos。旧号不重编。跨项目归并由本包 `portfolio-skill/` 承载（按中文名，不按缩写） |
 | 需求查询 | "需求完成多少了？" | requirements/requirement-register.md |
 | 源文档 / 拆解产物 | "这份合同拆了没？""SRC-001 摘要""这份合同讲什么" | **仅** SRC/CON 编号或「拆了没/讲什么」走本行：`sources/_index.md` → `_digest.md`。有 Python：读 `.state.json.source_digest_status[<id>]`；`stale`/`old_digest` 声明过期后读 atoms；`missing_page` 直走 atoms。无 Python：切片按 digest-schemas 属性串（`路径:size:mtime秒` 以 `|` 连接）比对；原件比对页头与 ledger 表列。失败则声明过期。取证才读 atoms/facts。主题页不得当价款/范围唯一证据。主题定位（如「住所核验现在怎样」）先走 §0 alias 一跳。未零清旧结构 → 门禁阻断并出零清清单 |
+| 这份资料和哪些文档有关 | "和这份硬件资料相关的文档" | 只读该源 `_digest.md` 的「参见」，再打开列出的路径。没有这节就回答无参见。禁止为此扫全库 |
 | 对账 / 查重 | "对账""同源合同" | WF-SD-1（07 §8.12）；提示一次不阻断主体任务 |
 | 重拆 / 二次拆解 | "再拆一下这份" | WF-SD-2（07 §8.6）；指纹未变则跳过 |
 | 风险/问题历史 | "某风险怎么演变的" | `risks/index.md` 或 `issues/index.md` → 活跃册条目时间线表；必要时按索引读归档册（归档=活历史，索引受控可读；禁止遍历 `backup/`） |

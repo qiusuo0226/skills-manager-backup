@@ -128,7 +128,12 @@ def _build_page(src_dir: Path, sid: str) -> str:
     fp = compute_slice_fp(src_dir)
     src_fp = ledger_source_fingerprint(src_dir) or "—"
     atoms = _atom_ids(src_dir)
-    rows = "\n".join(f"| {a} | `{a}` |" for a in atoms) or "| — | 本源未见 |"
+    if atoms:
+        rows = "\n".join(f"| {a} | `{a}` |" for a in atoms)
+    elif _has_facts(src_dir):
+        rows = "| facts.md | 非需求类 |"
+    else:
+        rows = "| — | 本源未见 |"
     cols = _columns(cat)
     parts = [
         "---",
@@ -218,6 +223,111 @@ def _source_refs(src_dir: Path) -> list[str]:
 
 def _atom_ids_in(src_dir: Path) -> list[str]:
     return _atom_ids(src_dir)
+
+
+def _has_facts(src_dir: Path) -> bool:
+    facts = src_dir / "facts.md"
+    if facts.is_file() and facts.stat().st_size > 0:
+        return True
+    folder = src_dir / "facts"
+    if not folder.is_dir():
+        return False
+    for p in folder.glob("**/*"):
+        if p.is_file() and p.suffix.lower() == ".md" and not p.name.startswith("."):
+            rel = p.relative_to(src_dir).as_posix()
+            if rel == "facts/local_only.md" or rel.startswith("facts/local_only/"):
+                continue
+            return True
+    return False
+
+
+def _doc_kind(src_dir: Path) -> tuple[str, str]:
+    """返回 (requirement|reference|invalid, note)。缺省是 requirement。"""
+    meta = src_dir / "meta.md"
+    if not meta.is_file():
+        return "requirement", ""
+    fm = _front(_read(meta))
+    raw = (fm.get("doc_kind") or "").strip()
+    note = (fm.get("doc_kind_note") or "").splitlines()
+    note_s = note[0].strip() if note else ""
+    if raw in ("", "requirement"):
+        return "requirement", note_s
+    if raw == "reference":
+        return "reference", note_s
+    return "invalid", note_s
+
+
+_SEE_RE = re.compile(
+    r"\b(SRC-[A-Za-z0-9._-]+|REQ-[A-Za-z0-9._-]+|WP-[A-Za-z0-9._-]+|"
+    r"MTG-[A-Za-z0-9._-]+|CON-[A-Za-z0-9._-]+|BID-[A-Za-z0-9._-]+|"
+    r"INIT-[A-Za-z0-9._-]+)\b"
+)
+
+
+def _slice_corpus(src_dir: Path) -> str:
+    parts: list[str] = []
+    for name in ("meta.md", "atoms.md", "facts.md"):
+        parts.append(_read(src_dir / name))
+    for sub in ("atoms", "facts"):
+        folder = src_dir / sub
+        if folder.is_dir():
+            for p in sorted(folder.glob("**/*.md")):
+                if p.is_file():
+                    parts.append(_read(p))
+    return "\n".join(parts)
+
+
+def _digested(sources: Path) -> dict[str, Path]:
+    out: dict[str, Path] = {}
+    if not sources.is_dir():
+        return out
+    for d in sources.iterdir():
+        if d.is_dir() and (d / "_digest.md").is_file():
+            out[d.name] = d
+    return out
+
+
+def _meeting_exists(ai: Path, mid: str) -> bool:
+    root = ai / "meetings"
+    if not root.is_dir():
+        return False
+    for p in root.rglob("*"):
+        if p.is_file() and p.name.startswith(mid):
+            return True
+    return False
+
+
+def _id_exists(ai: Path, token: str, reg_text: str, contract_text: str, digested: dict[str, Path]) -> bool:
+    if token.startswith("SRC-"):
+        d = digested.get(token)
+        return d is not None and (d / "meta.md").is_file()
+    if token.startswith("REQ-"):
+        return bool(re.search(rf"\b{re.escape(token)}\b", reg_text))
+    if token.startswith("WP-"):
+        return (ai / "wps" / f"{token}.md").is_file()
+    if token.startswith("MTG-"):
+        return _meeting_exists(ai, token)
+    if token.startswith(("CON-", "BID-", "INIT-")):
+        d = digested.get(token)
+        if d is not None and (d / "meta.md").is_file():
+            return True
+        return bool(re.search(rf"\b{re.escape(token)}\b", contract_text))
+    return False
+
+
+def _see_also(ai: Path, sid: str, src_dir: Path, reg_text: str, contract_text: str, digested: dict[str, Path]) -> list[str]:
+    found: set[str] = set()
+    for token in _SEE_RE.findall(_slice_corpus(src_dir)):
+        if token == sid:
+            continue
+        if _id_exists(ai, token, reg_text, contract_text, digested):
+            found.add(token)
+    title = _title(src_dir)
+    if title:
+        for other, folder in digested.items():
+            if other != sid and _title(folder) == title:
+                found.add(other)
+    return sorted(found)
 
 
 def _table_rows(text: str) -> tuple[list[str], list[list[str]]]:
@@ -356,6 +466,60 @@ def _set_bind(text: str, body: list[str]) -> str:
     return "\n".join(out).rstrip() + "\n"
 
 
+def _set_h2(text: str, title: str, body: list[str]) -> str:
+    lines = text.splitlines()
+    out: list[str] = []
+    i = 0
+    found = False
+    while i < len(lines):
+        if lines[i].startswith("## ") and lines[i].strip() == f"## {title}":
+            found = True
+            out.append(lines[i])
+            out.append("")
+            out.extend(body)
+            out.append("")
+            i += 1
+            while i < len(lines) and not lines[i].startswith("## "):
+                i += 1
+            continue
+        out.append(lines[i])
+        i += 1
+    if not found:
+        if out and out[-1] != "":
+            out.append("")
+        out.extend([f"## {title}", ""] + body)
+    return "\n".join(out).rstrip() + "\n"
+
+
+def _mark_reference(text: str, note: str) -> str:
+    lines = text.splitlines()
+    head_end = len(lines)
+    for i, line in enumerate(lines):
+        if line.startswith("## "):
+            head_end = i
+            break
+    head = lines[:head_end]
+    want = ["非需求类"]
+    if note and note != "非需求类":
+        want.append(note)
+    missing = [w for w in want if not any(ln.strip() == w for ln in head)]
+    if not missing:
+        return text if text.endswith("\n") else text + "\n"
+    out: list[str] = []
+    placed = False
+    for line in head:
+        out.append(line)
+        if not placed and line.startswith("# "):
+            out.append("")
+            out.extend(missing)
+            out.append("")
+            placed = True
+    if not placed:
+        out.extend([""] + missing + [""])
+    out.extend(lines[head_end:])
+    return "\n".join(out).rstrip() + "\n"
+
+
 def _bind_body(req_ids: list[str], wp_ids: list[str], siblings: list[str]) -> list[str]:
     body = [" / ".join(req_ids + wp_ids)]
     if siblings:
@@ -390,24 +554,38 @@ def _ensure_pointer(text: str, sid: str, ref: str, req_id: str) -> str:
     return text if text.endswith("\n") else text + "\n"
 
 
-def _apply_wiki(ai: Path, write: bool = True) -> int:
-    """已拆标准文件串成链。写不出则记缺口并返回失败数。没拆过的源只把已绑写成无登记边或已有编号。"""
+def _apply_wiki(ai: Path, write: bool = True, audit: bool = False) -> int:
+    """已拆标准文件串成链。写不出则记缺口并返回失败数。没拆过的源只把已绑写成无登记边或已有编号。
+
+    doc_kind: reference 不查需求、不查工包、不计缺口。参见只收已存在的编号和完全相同的标题。
+    """
     sources = ai / "requirements" / "sources"
     if not sources.is_dir():
         return 0
     register = ai / "requirements" / "requirement-register.md"
     reg_text = _read(register)
+    contract_text = _read(ai / "requirements" / "contract-register.md")
     dirs = [p for p in sorted(sources.iterdir()) if p.is_dir()]
     split = [d for d in dirs if _has_atoms(d)]
+    reference: dict[str, str] = {}
+    gaps: list[tuple[str, str]] = []
+    for d in dirs:
+        kind, note = _doc_kind(d)
+        if kind == "invalid":
+            gaps.append((d.name, "doc_kind 无法识别"))
+            continue
+        if kind == "reference" and (_has_atoms(d) or _has_facts(d)):
+            reference[d.name] = note
+    gapped_early = {sid for sid, _reason in gaps}
+    req_split = [d for d in split if d.name not in reference and d.name not in gapped_early]
     direct: dict[str, set[str]] = {}
     refs: dict[str, list[str]] = {}
-    for d in split:
+    for d in req_split:
         sid = d.name
         refs[sid] = _source_refs(d)
         direct[sid] = _direct_reqs(reg_text, sid, _atom_ids_in(d))
     chosen: dict[str, str] = {}
-    gaps: list[tuple[str, str]] = []
-    for d in split:
+    for d in req_split:
         sid = d.name
         if not refs[sid]:
             gaps.append((sid, "切片没有章节或页码"))
@@ -422,7 +600,7 @@ def _apply_wiki(ai: Path, write: bool = True) -> int:
         title = _title(d)
         titled = {
             next(iter(direct[other.name]))
-            for other in split
+            for other in req_split
             if other.name != sid and _title(other) == title and title and len(direct[other.name]) == 1
         }
         if len(titled) == 1:
@@ -448,7 +626,12 @@ def _apply_wiki(ai: Path, write: bool = True) -> int:
             text = _ensure_pointer(text, sid, refs[sid][0], req)
         if text != reg_text:
             register.write_text(text, encoding="utf-8")
+            reg_text = text
     gapped = {sid for sid, _reason in gaps}
+    if audit:
+        for sid in sorted(reference):
+            if sid not in gapped:
+                print(f"REFERENCE {sid}（豁免）")
     for d in dirs:
         sid = d.name
         digest = d / "_digest.md"
@@ -456,16 +639,27 @@ def _apply_wiki(ai: Path, write: bool = True) -> int:
             continue
         if sid in gapped:
             continue
-        if sid in chosen:
+        old = _read(digest)
+        if sid in reference:
+            new = _mark_reference(old, reference[sid])
+            new = _set_bind(new, ["非需求类"])
+        elif sid in chosen:
             siblings = sorted(s for s in by_req[chosen[sid]] if s != sid)
             body = _bind_body([chosen[sid]], wp_of[sid], siblings)
+            new = _set_bind(old, body)
         else:
-            ids = sorted(set(_direct_reqs(reg_text, sid, []) ) | set(_wp_ids_for(ai, sid, set(), reg_text)))
+            ids = sorted(set(_direct_reqs(reg_text, sid, [])) | set(_wp_ids_for(ai, sid, set(), reg_text)))
             body = [" / ".join(ids)] if ids else ["无登记边"]
-        old = _read(digest)
-        new = _set_bind(old, body)
+            new = _set_bind(old, body)
         if write and new != old:
             digest.write_text(new, encoding="utf-8")
+            new = _read(digest) if digest.is_file() else new
+        digested = _digested(sources)
+        see = _see_also(ai, sid, d, reg_text, contract_text, digested)
+        see_body = see if see else ["无参见"]
+        newer = _set_h2(new, "参见", see_body)
+        if write and newer != new:
+            digest.write_text(newer, encoding="utf-8")
     for sid, reason in gaps:
         line = f"- {sid}：{reason}"
         if write:
@@ -504,7 +698,8 @@ def compile_workspace(root: str, dry_run: bool = False, check_only: bool = False
             print(f"ok {src_dir.name}")
             skipped += 1
             continue
-        if not _has_atoms(src_dir):
+        kind, _note = _doc_kind(src_dir)
+        if not _has_atoms(src_dir) and not (kind == "reference" and _has_facts(src_dir)):
             print(f"FAIL {src_dir.name} 无 atoms，不空编")
             failed += 1
             continue
@@ -532,10 +727,10 @@ def compile_workspace(root: str, dry_run: bool = False, check_only: bool = False
             if key in seen_fail:
                 continue
             seen_fail.add(key)
-            if _has_atoms(src):
+            if _has_atoms(src) or (_doc_kind(src)[0] == "reference" and _has_facts(src)):
                 print(f"FAIL still {rec.get('status')} {src.name}")
                 failed += 1
-    failed += _apply_wiki(ai, write=not dry_run and not check_only)
+    failed += _apply_wiki(ai, write=not dry_run and not check_only, audit=check_only)
     print(f"done wrote={wrote} skip={skipped} fail={failed}")
     return 1 if failed else 0
 

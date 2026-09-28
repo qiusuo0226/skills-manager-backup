@@ -6,7 +6,11 @@ lifecycle_stage: [立项/招投标/合同签约/规划启动/需求设计/开发
 version: v1.0
 shared_from: —
 coverage: 本项目
+doc_kind: [requirement 或缺省 / reference]
+doc_kind_note: [可选。程序原样展示，不解析]
 ---
+
+程序只读上面的 YAML 头。正文表格里的同名字段不参与判定。`doc_kind` 不写时按需求文档。`reference` 表示这份不是需求文档。
 
 # SRC-NNN — {源文档名称}
 

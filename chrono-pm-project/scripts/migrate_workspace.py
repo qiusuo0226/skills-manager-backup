@@ -916,6 +916,14 @@ VERSION_CAPABILITIES = [
         "new_files": [],
         "note": "v4.0.0：说法表拆成两张各 7 列；单文件版本戳；查询与项目集收进能力目录。无新目录。",
     },
+    {
+        "version": "4.0.1",
+        "schema": "0.17.0",
+        "capabilities": ["doc_kind_reference"],
+        "new_dirs": [],
+        "new_files": [],
+        "note": "v4.0.1：非需求文档可声明 reference；摘要页参见只收已存在编号和完全相同的标题。无新目录。",
+    },
 ]
 
 # v2.1.0 已将 VERSION_CAPABILITIES 补齐至全部 50 个历史版本（0.1.0 ~ 2.1.0），

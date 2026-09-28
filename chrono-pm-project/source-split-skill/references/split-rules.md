@@ -2,7 +2,7 @@
 
 由 P-DOC-INGEST / P-SPLIT 加载本文件（SKILL.md「源文档拆解」行）。禁止未加载本文件就声称已拆解入库。需求/工作包绑定见 Project `07-requirement-rules.md`。编译主题页必须**同轮加载** `source-split-skill/references/digest-schemas.md`。产物禁止进 `outputs/`。禁止 `[[wikilink]]`。
 
-**不是本文件**：会议转写、会议纪要、例会录音稿、腾讯/视频会议导出 → 走 Project WF-3 / `02-meeting-rules.md`。仅当用户明示「把这份会议拆进 `sources/` / 当需求源文档」才加载本文件。
+**不是本文件**：没有独立文件的会议转写、口述纪要 → 走 Project WF-3 / `02-meeting-rules.md`，不进 `sources/`。用户明示「把这份会议拆进 `sources/`」时仍加载本文件。甩来的开会文件或日报文件也加载本文件，meta 头写 `doc_kind: reference`，并仍走会议或日报的提取。保留「除非用户明示拆进 `sources/`」，不删除。
 
 **工人只写** `requirements/sources/{编号}/atoms/part-NN-*.md`（或 facts 分片）与抽出图。ledger、`_digest.md`、`sources/_index.md`、parse-log 收尾由协调者写。禁止工人写 `_index` 与 `_digest.md`。
 
