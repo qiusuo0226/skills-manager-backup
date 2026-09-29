@@ -1,7 +1,7 @@
 {
   "name": "chrono-pm-project",
   "displayName": "ChronoPM-Project — 项目管理（日报/待办/计划/风险/周报）",
-  "version": "4.0.1",
+  "version": "4.1.0",
   "schemaVersion": "0.7.0",
   "supportedWorkspaceSchema": {
     "min": "0.1.0",
@@ -107,6 +107,11 @@
     "python": ">=3.9"
   },
   "versionHistory": [
+    {
+      "version": "4.1.0",
+      "date": "2026-09-29",
+      "summary": "Minor：父块留表和图；按子块绑定；有编号无在用包则建待确认包；已有摘要页不重写。schema 保持 0.17.0。回归 1094。"
+    },
     {
       "version": "4.0.1",
       "date": "2026-09-28",
@@ -604,8 +609,8 @@
     }
   ],
   "blueprint": {
-    "lastUpdated": "2026-09-28",
-    "lastVersion": "4.0.1",
+    "lastUpdated": "2026-09-29",
+    "lastVersion": "4.1.0",
     "updateRequiredOn": [
       "major",
       "minor",

@@ -128,7 +128,7 @@ Skill 包根 = 与 `SKILL.md` 同级。CQ-5：禁对话记忆当证据。
 | 源文档 / 拆解产物 | "这份合同拆了没？""SRC-001 摘要""这份合同讲什么" | **仅** SRC/CON 编号或「拆了没/讲什么」走本行：`sources/_index.md` → `_digest.md`。有 Python：读 `.state.json.source_digest_status[<id>]`；`stale`/`old_digest` 声明过期后读 atoms；`missing_page` 直走 atoms。无 Python：切片按 digest-schemas 属性串（`路径:size:mtime秒` 以 `|` 连接）比对；原件比对页头与 ledger 表列。失败则声明过期。取证才读 atoms/facts。主题页不得当价款/范围唯一证据。主题定位（如「住所核验现在怎样」）先走 §0 alias 一跳。未零清旧结构 → 门禁阻断并出零清清单 |
 | 这份资料和哪些文档有关 | "和这份硬件资料相关的文档" | 只读该源 `_digest.md` 的「参见」，再打开列出的路径。没有这节就回答无参见。禁止为此扫全库 |
 | 对账 / 查重 | "对账""同源合同" | WF-SD-1（07 §8.12）；提示一次不阻断主体任务 |
-| 重拆 / 二次拆解 | "再拆一下这份" | WF-SD-2（07 §8.6）；指纹未变则跳过 |
+| 重拆 / 二次拆解 | "再拆一下这份" | WF-SD-2（07 §8.6）；未点名且指纹未变则跳过；点名强制重拆则执行 |
 | 风险/问题历史 | "某风险怎么演变的" | `risks/index.md` 或 `issues/index.md` → 活跃册条目时间线表；必要时按索引读归档册（归档=活历史，索引受控可读；禁止遍历 `backup/`） |
 | 查词义 / 查词库条目 | "这个词是什么意思？""查一下农专" | 本项目 `context/domain-glossary.md`（N-27）。只返回词库条目；`confirmed` 给标准词+释义，`pending` 标注候选。跨项目查词由本包 `portfolio-skill/` 读 glossary-index 指针，本包不代查他项目 |
 | 成本查询 | "预算执行情况？" | `project-info/budget.md`（项目预算/P&L）。**不得**与人员能耗混读 |

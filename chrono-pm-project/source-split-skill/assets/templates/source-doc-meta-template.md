@@ -8,9 +8,10 @@ shared_from: —
 coverage: 本项目
 doc_kind: [requirement 或缺省 / reference]
 doc_kind_note: [可选。程序原样展示，不解析]
+split_profile: [可选。只有 4.1.0 才按子块绑定。不写不等于 4.1.0]
 ---
 
-程序只读上面的 YAML 头。正文表格里的同名字段不参与判定。`doc_kind` 不写时按需求文档。`reference` 表示这份不是需求文档。
+程序只读上面的 YAML 头。正文表格里的同名字段不参与判定。`doc_kind` 不写时按需求文档。`reference` 表示这份不是需求文档。`split_profile` 不写时按旧口径整份绑定，已有摘要页不改字节。
 
 # SRC-NNN — {源文档名称}
 

@@ -1610,7 +1610,7 @@
 |---|---|---|---|
 | UG-S01 | upgrade-to 无存量节且本版改了页规格 | 不得开工 | negative |
 | UG-S02 | 存量未做完就改 `.skill-version.json` 或写「可以投入使用」 | 失败 | negative |
-| UG-S03 | 工作区有 `old_digest`；跑 compile | 写出 `doc_type: source-digest`；栏目在；切片索引在 | positive |
+| UG-S03 | 工作区有 `old_digest`，且没有 `split_profile: 4.1.0`；跑 compile | 摘要页字节保持不变；退出码不因 old_digest 本身为 1 | positive |
 | UG-S04 | 源无 atoms 就编译 | FAIL，不空编 | negative |
 | UG-S05 | 页头合格且已绑已串完 | 不重写整页；已绑仍是占位则只改已绑 | regression |
 | UG-S06 | 日常 `refresh_views.py --all` | 仍不重编 `_digest.md` | regression |
@@ -1623,8 +1623,8 @@
 
 | Case ID | Input | Expected | Type |
 |---|---|---|---|
-| UE-001 | 登记册已有该源的需求编号和工作包 | 已绑写上这两个编号；退出码 0 | positive |
-| UE-002 | 源还没有拆解条目，登记里也没有编号 | 已绑为 `无登记边`；不出现新编号 | positive |
+| UE-001 | 登记册已有该源的需求编号和工作包，摘要页已经存在且无 4.1.0 profile | 摘要页字节不变；登记册仍有这两个编号；退出码 0 | positive |
+| UE-002 | 源还没有拆解条目，登记里也没有编号，摘要页已存在 | 摘要页字节不变；不出现新编号 | positive |
 | UE-003 | 已绑里有登记册不存在的编号 | 退出码非 0；版本号不变 | negative |
 | UE-004 | 页头合格，已绑仍是占位，且链没串完 | 不得把写出 0 页当成功；版本号不变 | negative |
 | UE-005 | 工作区版本已等于技能版本，已绑仍空 | 仍补写已绑 | positive |
@@ -1698,6 +1698,35 @@
 | DR-102 | 甩来一份日报文件 | 建成 sources/，doc_kind=reference；进展仍进各人当天待办 | positive |
 | MT-101 | 甩来一份会议文件 | 建成 sources/，doc_kind=reference；行动项仍进待办 | positive |
 | MT-102 | 粘贴会议转写，没有文件 | 只走会议纪要；不建 sources/ | regression |
+
+## 98. 父块绑定与待确认包（v4.1.0 CR-20260929-001）
+
+施工只认合计 **1094**（1072+22）。禁止沿用 1072。已有摘要页且没有 `split_profile: 4.1.0` 时不改字节。`missing_page` 仍写第一页。没有需求编号不建包。
+
+| Case ID | Input | Expected | Type |
+|---|---|---|---|
+| SB-001 | 一节里有一张表 | 父块内表头和单元格都在 | positive |
+| SB-002 | 一节里有内容图 | `figures/` 有文件，父块有相对路径；读不出则写「文字没读出」 | positive |
+| SB-003 | 一份新源两个子块对上两条已有需求 | 两块都写下，不出现整份失败 | positive |
+| SB-004 | 需求在册，无未废弃包 | 新建待确认包，§2 只有该编号，不问 | positive |
+| SB-005 | 需求已在未废弃包 | 不新建，原包仍有该编号 | regression |
+| SB-006 | 编号只在废包 | 新建包；废包 `superseded_by` 不变 | regression |
+| SB-007 | 点名重拆且指纹相同 | 该源重拆，摘要页重写，`split_profile` 为 4.1.0 | positive |
+| SB-008 | 已确认说法唯一对上一个在用包 | 绑这个包；词库为空则不把企业换成公司 | positive |
+| SB-009 | 无 profile，摘要状态 ok | atoms、facts、figures、`_digest.md` 字节不变；已绑与参见也不改 | regression |
+| SB-010 | 旧源没有可确定的需求 | 退出码 1，不改已有摘要页，不盖戳 | regression |
+| SB-011 | reference 对上多条 | 退出码 0，与 DK-005 相同 | regression |
+| SB-012 | 无需求编号 | 不建包 | negative |
+| SB-013 | 废包与在用包含同一编号 | 候选只有在用包，不提问 | regression |
+| SB-014 | 两个未废弃包都有该编号 | 两个都留 | regression |
+| SB-015 | 指纹相同且未点名 | 不重拆 | regression |
+| SB-016 | 新建的待确认包名称像一条待办 | 自动归属不选它；索引进行中仍列出 | regression |
+| SB-017 | 两段用词相近但标题不同 | 参见不建立；标题完全相同仍建立 | regression |
+| SB-018 | 子块绑定 | 已绑或指针含父块路径 | positive |
+| SB-019 | 已确认说法对上两个目标 | 不连，该子块留下 | negative |
+| SB-020 | 无编号且无后继 | 不建包 | negative |
+| SB-021 | 只有装饰图 | 不要求产生图文件 | negative |
+| SB-022 | 无 profile，摘要状态为 stale 或 old_digest | 四类字节不变；不调用 `_build_page`；退出码不因状态本身为 1 | regression |
 
 ## 回归用例统计
 
@@ -1800,4 +1829,5 @@
 | 升级执行程序强制 (95) | 17 | 6 | 11 |
 | 查询定位与单包 (96) | 13 | 3 | 10 |
 | 非需求豁免与出文件路径 (97) | 31 | 13 | 18 |
-| **合计** | **1072** | **600** | **472** |
+| 父块绑定与待确认包 (98) | 22 | 7 | 15 |
+| **合计** | **1094** | **607** | **487** |

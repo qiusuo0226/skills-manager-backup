@@ -20,7 +20,7 @@
 | 属性 | 值 |
 |---|---|
 | Skill 名称 | ChronoPM — Markdown 驱动的 AI 项目管理技能 |
-| 当前版本 | 4.0.1（只发行 ChronoPM-Project；查询与项目集是包内能力目录；版本单一事实源为 `scripts/_version.py`） |
+| 当前版本 | 4.1.0（只发行 ChronoPM-Project；查询与项目集是包内能力目录；版本单一事实源为 `scripts/_version.py`） |
 | Workspace Schema | 详见 `scripts/_version.py`（WORKSPACE_SCHEMA_VERSION） |
 | 创建日期 | 2026-08-09 |
 | 最后更新 | 2026-09-22（v3.30.3：程序执行升级，已拆标准文件串联）；2026-09-21（v3.30.2：快扫结转 + 存量回填）；更早见 CHANGELOG |
@@ -608,6 +608,7 @@ ChronoPM 建立在三层信任模型之上：
 | 3.30.3 | 程序执行升级；已拆标准文件串成来源指针、文档链接和工作包编号；schema 保持 0.17.0；Module 95（总计 1028） | CR-20260922-001 / upgrade-to-3.30.3.md |
 | 4.0.0 | 查询与项目集收进能力目录；单文件版本戳；说法表合并；不再发行 Portfolio 包；schema 保持 0.17.0；Module 96（总计 1041） | CR-20260923-001 / upgrade-to-4.0.0.md |
 | 4.0.1 | 非需求文档可声明 reference；摘要页参见；日报文件与开会文件拆档；出文件路径裁决；schema 保持 0.17.0；Module 97（总计 1072） | CR-20260928-001 / upgrade-to-4.0.1.md |
+| 4.1.0 | 父块留表和图；按子块绑定；有编号无在用包则建待确认包；已有摘要页不重写；schema 保持 0.17.0；Module 98（总计 1094） | CR-20260929-001 / upgrade-to-4.1.0.md |
 | 3.30.1 | 原件指纹比对 + 属性串文档 + missing_page 巡检 + as_of 不参与 skip；schema 保持 0.17.0；SW-017（总计 997） | CR-20260920-002 / upgrade-to-3.30.1.md |
 | 3.30.0 | 单源主题页（_digest 栏目页 + source_digest_status 过期检测）；schema 保持 0.17.0；Module 92（总计 996） | CR-20260920-001 / upgrade-to-3.30.0.md |
 | 3.29.0 | 投喂一次做完（底线20；投喂不问绑包、口述仍问）+ 源文档抽出图 figures/；schema 保持 0.17.0；Module 90+91（总计 980） | CR-20260913-001～002 / upgrade-to-3.29.0.md |

@@ -48,9 +48,12 @@ def test_ue001_copy_ids():
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
         _project(root)
+        before = (root / "ai/requirements/sources/SRC-001/_digest.md").read_text(encoding="utf-8")
         assert enforce(root) == 0
         text = (root / "ai/requirements/sources/SRC-001/_digest.md").read_text(encoding="utf-8")
-        assert "REQ-1" in text and "WP-1" in text
+        assert text == before
+        reg = (root / "ai/requirements/requirement-register.md").read_text(encoding="utf-8")
+        assert "REQ-1" in reg and "WP-1" in reg
         assert "[[ " not in text and "[[" not in text
 
 
@@ -64,9 +67,10 @@ def test_ue002_unsplit_marker():
         fp = compute_slice_fp(d)
         digest = d / "_digest.md"
         digest.write_text(digest.read_text(encoding="utf-8").replace("slice_fingerprint: abc", f"slice_fingerprint: {fp}"), encoding="utf-8")
+        before = digest.read_text(encoding="utf-8")
         assert compile_workspace(str(root)) == 0
-        text = (root / "ai/requirements/sources/SRC-001/_digest.md").read_text(encoding="utf-8")
-        assert "无登记边" in text
+        text = digest.read_text(encoding="utf-8")
+        assert text == before
         assert "REQ-" not in text
 
 
@@ -122,7 +126,6 @@ def test_ue015_same_title():
         d2 = root / "ai" / "requirements" / "sources" / "SRC-002"
         _write(d2 / "meta.md", "---\nsource_id: SRC-002\n---\n\n# SRC-002 — 新设名称\n")
         _write(d2 / "atoms.md", "ATOM-2 条款\n- source_ref: 第2章\n")
-        _write(d2 / "_digest.md", "---\ndoc_type: source-digest\nsource_id: SRC-002\n---\n\n# SRC-002\n\n## 已绑\n\n—\n")
         assert enforce(root) == 0
         reg = (root / "ai/requirements/requirement-register.md").read_text(encoding="utf-8")
         assert "sources/SRC-002" in reg

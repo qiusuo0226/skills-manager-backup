@@ -924,6 +924,14 @@ VERSION_CAPABILITIES = [
         "new_files": [],
         "note": "v4.0.1：非需求文档可声明 reference；摘要页参见只收已存在编号和完全相同的标题。无新目录。",
     },
+    {
+        "version": "4.1.0",
+        "schema": "0.17.0",
+        "capabilities": ["section_split", "live_wp_backfill"],
+        "new_dirs": [],
+        "new_files": [],
+        "note": "v4.1.0：不重拆旧源；只为已有需求编号补待确认包。new_files 只列 check_missing_files 要核对的脚手架路径，4.1.0 没有这类新路径，所以列表为空。补包函数运行时新建的 wps/WP-*.md 是数据文件，不写入 new_files。",
+    },
 ]
 
 # v2.1.0 已将 VERSION_CAPABILITIES 补齐至全部 50 个历史版本（0.1.0 ~ 2.1.0），
@@ -1203,15 +1211,16 @@ def extract_scope_backfill(ai_dir: Path, dry_run: bool = False) -> int:
     return pending
 
 
-def refresh_views_force(project_root: Path) -> None:
+def refresh_views_force(project_root: Path) -> int:
     script = Path(__file__).parent / "refresh_views.py"
     if not script.is_file():
-        return
+        return 1
     import subprocess
-    subprocess.run(
+    proc = subprocess.run(
         [sys.executable, str(script), "--project-root", str(project_root), "--all", "--force"],
         check=False,
     )
+    return proc.returncode
 
 
 def stamp_skill_version(ai_dir: Path, mode: str, skill_version: str = None, gates_passed: bool = False):
@@ -2382,6 +2391,25 @@ def migrate_workspace(project_root: str, dry_run: bool = False, target_version: 
     )
     if needs_v400:
         print("v4.0.0：成员根合并说法表并写版本戳；集根只重写术语指针。失败不盖戳。")
+
+    needs_v410 = _vcmp(skill_version, "4.1.0") >= 0 and (
+        current_ws_version == "unknown" or _vcmp(current_ws_version, "4.1.0") < 0
+    )
+    portfolio_root = (ai_dir / "portfolio").is_dir() and (ai_dir / "projects").is_dir()
+    if needs_v410 and not portfolio_root:
+        print("v4.1.0：不重拆旧源；只为已有需求编号补待确认包。new_files 仍为空，包文件由补包函数创建。")
+        if not dry_run:
+            try:
+                from compile_source_digests import backfill_live_wps
+            except ImportError as e:
+                print(f"  FAIL 无法导入补包函数: {e}")
+                return
+            created = backfill_live_wps(ai_dir)
+            if created:
+                rc = refresh_views_force(ai_dir.parent)
+                if rc:
+                    print("  工作包索引未刷新，包文件保留，不得更新 skillVersion")
+                    return
 
     needs_v390 = _vcmp(skill_version, "3.9.0") >= 0 and (
         current_ws_version == "unknown"

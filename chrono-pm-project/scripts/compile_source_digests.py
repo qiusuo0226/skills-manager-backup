@@ -257,6 +257,265 @@ def _doc_kind(src_dir: Path) -> tuple[str, str]:
     return "invalid", note_s
 
 
+def _split_profile(src_dir: Path) -> str:
+    meta = src_dir / "meta.md"
+    if not meta.is_file():
+        return ""
+    return (_front(_read(meta)).get("split_profile") or "").strip()
+
+
+def _digest_frozen(src_dir: Path) -> bool:
+    """已有摘要页、且不是 4.1.0：不改字节。还没有摘要页的仍可写出第一页。"""
+    return _split_profile(src_dir) != "4.1.0" and (src_dir / "_digest.md").is_file()
+
+
+def _wp_effect(ai: Path, wp_id: str) -> str:
+    fm = _front(_read(ai / "wps" / f"{wp_id}.md"))
+    return (fm.get("effect") or "正常").strip() or "正常"
+
+
+def _wp_name(ai: Path, wp_id: str) -> str:
+    for line in _read(ai / "wps" / f"{wp_id}.md").splitlines():
+        if line.startswith("# "):
+            rest = line[2:].strip()
+            if " - " in rest:
+                return rest.split(" - ", 1)[1].strip()
+            if "—" in rest:
+                return rest.split("—", 1)[1].strip()
+            return rest
+    return ""
+
+
+def _req_titles(register_text: str) -> dict[str, str]:
+    headers, rows = _table_rows(register_text)
+    req_i = _col(headers, "Req", "需求编号")
+    title_i = _col(headers, "标题")
+    out: dict[str, str] = {}
+    if req_i < 0:
+        return out
+    for row in rows:
+        if req_i >= len(row):
+            continue
+        rid = row[req_i]
+        if not (REQ_RE.fullmatch(rid) or rid.startswith("REQ-")):
+            continue
+        title = row[title_i].strip() if 0 <= title_i < len(row) else ""
+        out[rid] = title
+    return out
+
+
+def _register_ids(register_text: str) -> list[str]:
+    return list(_req_titles(register_text))
+
+
+def _confirmed_pairs(ai: Path) -> list[tuple[str, str]]:
+    text = _read(ai / "context" / "domain-glossary.md")
+    pairs: list[tuple[str, str]] = []
+    in_main = False
+    for line in text.splitlines():
+        if line.startswith("## 1") and not line.startswith("## 1b"):
+            in_main = True
+            continue
+        if in_main and line.startswith("## "):
+            break
+        if not in_main or not line.startswith("|"):
+            continue
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if len(cells) < 5 or cells[1] in ("说法", "") or set(cells[1]) <= {"-", ":"}:
+            continue
+        if cells[4] != "confirmed":
+            continue
+        if cells[1] and cells[2]:
+            pairs.append((cells[1], cells[2]))
+    return pairs
+
+
+def _atom_blobs(src_dir: Path) -> list[tuple[str, str, str]]:
+    """(atom_id, text, parent_ref)。parent_ref 来自该 ATOM 文件头或正文行。"""
+    files: list[Path] = []
+    atoms = src_dir / "atoms.md"
+    if atoms.is_file():
+        files.append(atoms)
+    folder = src_dir / "atoms"
+    if folder.is_dir():
+        files.extend(sorted(p for p in folder.glob("**/*.md") if p.is_file()))
+    out: list[tuple[str, str, str]] = []
+    for p in files:
+        text = _read(p)
+        file_parent = (_front(text).get("parent_ref") or "").strip()
+        current = ""
+        buf: list[str] = []
+        parent = file_parent
+        def flush() -> None:
+            if current:
+                out.append((current, "\n".join(buf), parent))
+        for line in text.splitlines():
+            stripped = line.strip()
+            if stripped.startswith("parent_ref:"):
+                parent = stripped.split(":", 1)[1].strip().strip('"').strip("'") or parent
+                buf.append(line)
+                continue
+            bare = stripped.lstrip("-").strip()
+            if bare.startswith("#"):
+                bare = bare.lstrip("#").strip()
+            m = ATOM_RE.match(bare)
+            if m:
+                flush()
+                current = m.group(0)
+                buf = [line]
+                continue
+            buf.append(line)
+        flush()
+    return out
+
+
+def _live_wp_ids_for_req(ai: Path, register_text: str, req_id: str) -> list[str]:
+    found: set[str] = set()
+    headers, rows = _table_rows(register_text)
+    req_i = _col(headers, "Req", "需求编号")
+    wp_i = _col(headers, "工作包")
+    if req_i >= 0 and wp_i >= 0:
+        for row in rows:
+            if req_i < len(row) and row[req_i] == req_id and wp_i < len(row):
+                for wp in WP_RE.findall(row[wp_i]):
+                    if _wp_effect(ai, wp) != "废弃":
+                        found.add(wp)
+    wps = ai / "wps"
+    if wps.is_dir():
+        for wp in sorted(wps.glob("WP-*.md")):
+            if _wp_effect(ai, wp.stem) == "废弃":
+                continue
+            if req_id in _section2(_read(wp)):
+                found.add(wp.stem)
+    return sorted(found)
+
+
+def _set_register_wp(register_text: str, req_id: str, wp_ids: list[str]) -> str:
+    headers, _rows = _table_rows(register_text)
+    req_i = _col(headers, "Req", "需求编号")
+    wp_i = _col(headers, "工作包")
+    if req_i < 0 or wp_i < 0:
+        return register_text
+    cell = " / ".join(wp_ids)
+    lines = register_text.splitlines()
+    for i, line in enumerate(lines):
+        if not line.startswith("|") or req_id not in line:
+            continue
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if req_i >= len(cells) or cells[req_i] != req_id:
+            continue
+        while len(cells) <= wp_i:
+            cells.append("")
+        cells[wp_i] = cell
+        lines[i] = "| " + " | ".join(cells) + " |"
+        break
+    text = "\n".join(lines)
+    return text if text.endswith("\n") else text + "\n"
+
+
+def _next_wp_id(ai: Path, day: str) -> str:
+    n = 0
+    wps = ai / "wps"
+    if wps.is_dir():
+        for p in wps.glob(f"WP-{day}-*.md"):
+            m = re.search(r"-(\d+)$", p.stem)
+            if m:
+                n = max(n, int(m.group(1)))
+    return f"WP-{day}-{n + 1:03d}"
+
+
+def _write_backfill_wp(path: Path, wp_id: str, title: str, req_id: str, day: str) -> None:
+    name = title or req_id
+    body = (
+        "---\n"
+        "doc_type: work-package\n"
+        f"wp_id: {wp_id}\n"
+        "project: —\n"
+        "plan_ref:\n"
+        "status: 待确认\n"
+        "effect: 正常\n"
+        "superseded_by: —\n"
+        f"created_at: {day}\n"
+        "completed_at: —\n"
+        "retired_at: —\n"
+        "---\n\n"
+        f"# {wp_id} - {name}\n\n"
+        "## 1. 基本信息\n"
+        "| 字段 | 值 |\n|---|---|\n"
+        f"| WP 编号 | {wp_id} |\n"
+        f"| WP 名称 | {name} |\n"
+        "| 负责人 | — |\n"
+        "| 开始时间 | — |\n"
+        "| 结束时间 | — |\n"
+        "| 生效 | 正常 |\n"
+        f"| 关联需求 | {req_id} |\n\n"
+        "## 2. 关联需求（强制字段，只留编号）\n"
+        "| 需求编号 | 来源路径 |\n|---|---|\n"
+        f"| {req_id} | — |\n\n"
+        "## 7. 状态历史\n"
+        "| 时间 | 从状态 | 到状态 |\n|---|---|---|\n"
+        f"| {day} | — | 待确认 |\n"
+    )
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(".md.tmp")
+    tmp.write_text(body, encoding="utf-8")
+    tmp.replace(path)
+
+
+def backfill_live_wps(ai: Path, only_ids: set[str] | None = None) -> list[str]:
+    """为登记册上还没有未废弃包的需求编号建待确认包。无编号不建。返回新建编号。"""
+    register = ai / "requirements" / "requirement-register.md"
+    reg_text = _read(register)
+    titles = _req_titles(reg_text)
+    ids = [i for i in titles if only_ids is None or i in only_ids]
+    created: list[str] = []
+    day = date.today().strftime("%Y%m%d")
+    for req_id in ids:
+        if not req_id:
+            continue
+        live = _live_wp_ids_for_req(ai, reg_text, req_id)
+        if live:
+            headers, rows = _table_rows(reg_text)
+            wp_i = _col(headers, "工作包")
+            req_i = _col(headers, "Req", "需求编号")
+            column: list[str] = []
+            if req_i >= 0 and wp_i >= 0:
+                for row in rows:
+                    if req_i < len(row) and row[req_i] == req_id and wp_i < len(row):
+                        column = [w for w in WP_RE.findall(row[wp_i]) if _wp_effect(ai, w) != "废弃"]
+                        break
+            if not column:
+                reg_text = _set_register_wp(reg_text, req_id, live)
+            continue
+        if not register.is_file():
+            continue
+        wp_id = _next_wp_id(ai, day)
+        wp_path = ai / "wps" / f"{wp_id}.md"
+        _write_backfill_wp(wp_path, wp_id, titles.get(req_id, ""), req_id, day)
+        new_reg = _set_register_wp(reg_text, req_id, [wp_id])
+        try:
+            register.write_text(new_reg, encoding="utf-8")
+        except OSError:
+            wp_path.unlink(missing_ok=True)
+            continue
+        written = _read(register)
+        if wp_id not in written or req_id not in written:
+            wp_path.unlink(missing_ok=True)
+            continue
+        reg_text = written
+        created.append(wp_id)
+    if register.is_file() and reg_text != _read(register):
+        try:
+            register.write_text(reg_text, encoding="utf-8")
+        except OSError:
+            pass
+    line = f"BACKFILL created={len(created)}"
+    if created:
+        line += " " + " ".join(created)
+    print(line)
+    return created
+
+
 _SEE_RE = re.compile(
     r"\b(SRC-[A-Za-z0-9._-]+|REQ-[A-Za-z0-9._-]+|WP-[A-Za-z0-9._-]+|"
     r"MTG-[A-Za-z0-9._-]+|CON-[A-Za-z0-9._-]+|BID-[A-Za-z0-9._-]+|"
@@ -327,6 +586,14 @@ def _see_also(ai: Path, sid: str, src_dir: Path, reg_text: str, contract_text: s
         for other, folder in digested.items():
             if other != sid and _title(folder) == title:
                 found.add(other)
+        for rid, req_title in _req_titles(reg_text).items():
+            if req_title and req_title == title:
+                found.add(rid)
+    hits, blocked = _glossary_matches(ai, _slice_corpus(src_dir), reg_text, digested, sid)
+    if not blocked:
+        for token in hits:
+            if token != sid:
+                found.add(token)
     return sorted(found)
 
 
@@ -395,7 +662,7 @@ def _wp_ids_for(ai: Path, sid: str, req_ids: set[str], register_text: str) -> li
             body = _section2(_read(wp))
             if f"sources/{sid}" in body or any(r in body for r in req_ids):
                 found.add(wp.stem)
-    return sorted(found)
+    return sorted(wp for wp in found if _wp_effect(ai, wp) != "废弃")
 
 
 def _direct_reqs(register_text: str, sid: str, atom_ids: list[str]) -> set[str]:
@@ -554,7 +821,136 @@ def _ensure_pointer(text: str, sid: str, ref: str, req_id: str) -> str:
     return text if text.endswith("\n") else text + "\n"
 
 
-def _apply_wiki(ai: Path, write: bool = True, audit: bool = False) -> int:
+def _glossary_matches(
+    ai: Path, text: str, reg_text: str, digested: dict[str, Path], sid: str
+) -> tuple[list[str], bool]:
+    """说法出现在 text 里、且登记名恰好对上一个未废弃目标时返回该编号。对上多个则整段不作数。"""
+    pairs = _confirmed_pairs(ai)
+    if not pairs or not text:
+        return [], False
+    titles = _req_titles(reg_text)
+    collected: list[str] = []
+    blocked = False
+    wps = ai / "wps"
+    for phrase, canonical in pairs:
+        if not phrase or phrase not in text:
+            continue
+        hits: list[str] = []
+        if wps.is_dir():
+            for wp in sorted(wps.glob("WP-*.md")):
+                if _wp_effect(ai, wp.stem) == "废弃":
+                    continue
+                if _wp_name(ai, wp.stem) == canonical:
+                    hits.append(wp.stem)
+        for rid, title in titles.items():
+            if title and title == canonical:
+                hits.append(rid)
+        for other, folder in digested.items():
+            if other != sid and _title(folder) == canonical:
+                hits.append(other)
+        uniq = sorted(set(hits))
+        if len(uniq) > 1:
+            blocked = True
+        elif len(uniq) == 1:
+            collected.append(uniq[0])
+    if blocked or len(set(collected)) > 1:
+        return [], True
+    return sorted(set(collected)), False
+
+
+def _req_ids_in_section2(ai: Path, wp_id: str) -> list[str]:
+    found: list[str] = []
+    for token in REQ_RE.findall(_section2(_read(ai / "wps" / f"{wp_id}.md"))):
+        if token not in found:
+            found.append(token)
+    return found
+
+
+def _register_atom_map(reg_text: str, sid: str, atom_ids: set[str]) -> tuple[dict[str, set[str]], set[str]]:
+    per: dict[str, set[str]] = {}
+    source_level: set[str] = set()
+    headers, rows = _table_rows(reg_text)
+    req_i = _col(headers, "Req", "需求编号")
+    src_i = _col(headers, "来源")
+    if req_i < 0 or src_i < 0:
+        return per, source_level
+    for row in rows:
+        if max(req_i, src_i) >= len(row):
+            continue
+        rid = row[req_i]
+        if not (REQ_RE.fullmatch(rid) or str(rid).startswith("REQ-")):
+            continue
+        src = row[src_i]
+        if f"sources/{sid}" not in src:
+            continue
+        mentioned = [a for a in atom_ids if a in src]
+        if mentioned:
+            for atom in mentioned:
+                per.setdefault(atom, set()).add(rid)
+        else:
+            source_level.add(rid)
+    return per, source_level
+
+
+def _profile_choices(
+    ai: Path, src_dir: Path, reg_text: str, digested: dict[str, Path]
+) -> tuple[list[tuple[str, str, str]], list[tuple[str, str]]]:
+    """4.1.0 按子块定需求。(atom, req, parent)；atom 为 * 表示整源一条。缺口键用 源/ATOM。"""
+    sid = src_dir.name
+    blobs = _atom_blobs(src_dir)
+    per, source_level = _register_atom_map(reg_text, sid, {b[0] for b in blobs})
+    binds: list[tuple[str, str, str]] = []
+    gaps: list[tuple[str, str]] = []
+
+    def gloss_one(atom: str, text: str, parent: str) -> None:
+        hits, blocked = _glossary_matches(ai, text, reg_text, digested, sid)
+        if blocked:
+            gaps.append((f"{sid}/{atom}", "对上两个目标"))
+            return
+        wps = [h for h in hits if h.startswith("WP-")]
+        reqs = [h for h in hits if h.startswith("REQ-")]
+        if len(wps) + len(reqs) > 1:
+            gaps.append((f"{sid}/{atom}", "对上两个目标"))
+            return
+        if len(wps) == 1:
+            owned = _req_ids_in_section2(ai, wps[0])
+            if len(owned) == 1:
+                binds.append((atom, owned[0], parent))
+            elif len(owned) > 1:
+                gaps.append((f"{sid}/{atom}", "对上两个目标"))
+            else:
+                gaps.append((f"{sid}/{atom}", "没有可确定的需求"))
+            return
+        if len(reqs) == 1:
+            binds.append((atom, reqs[0], parent))
+            return
+        gaps.append((f"{sid}/{atom}", "没有可确定的需求"))
+
+    if per:
+        for atom, text, parent in blobs:
+            cands = per.get(atom, set())
+            if len(cands) == 1:
+                binds.append((atom, next(iter(cands)), parent))
+            elif len(cands) > 1:
+                gaps.append((f"{sid}/{atom}", "同时对上好几条需求"))
+            else:
+                gloss_one(atom, text, parent)
+        return binds, gaps
+    if len(source_level) > 1:
+        gaps.append((sid, "同时对上好几条需求"))
+        return [], gaps
+    if len(source_level) == 1:
+        binds.append(("*", next(iter(source_level)), ""))
+        return binds, gaps
+    if not blobs:
+        gaps.append((sid, "没有可确定的需求"))
+        return [], gaps
+    for atom, text, parent in blobs:
+        gloss_one(atom, text, parent)
+    return binds, gaps
+
+
+def _apply_wiki(ai: Path, write: bool = True, audit: bool = False, frozen_ids: set[str] | None = None) -> int:
     """已拆标准文件串成链。写不出则记缺口并返回失败数。没拆过的源只把已绑写成无登记边或已有编号。
 
     doc_kind: reference 不查需求、不查工包、不计缺口。参见只收已存在的编号和完全相同的标题。
@@ -578,14 +974,15 @@ def _apply_wiki(ai: Path, write: bool = True, audit: bool = False) -> int:
             reference[d.name] = note
     gapped_early = {sid for sid, _reason in gaps}
     req_split = [d for d in split if d.name not in reference and d.name not in gapped_early]
+    legacy = [d for d in req_split if _split_profile(d) != "4.1.0"]
     direct: dict[str, set[str]] = {}
     refs: dict[str, list[str]] = {}
-    for d in req_split:
+    for d in legacy:
         sid = d.name
         refs[sid] = _source_refs(d)
         direct[sid] = _direct_reqs(reg_text, sid, _atom_ids_in(d))
     chosen: dict[str, str] = {}
-    for d in req_split:
+    for d in legacy:
         sid = d.name
         if not refs[sid]:
             gaps.append((sid, "切片没有章节或页码"))
@@ -600,7 +997,7 @@ def _apply_wiki(ai: Path, write: bool = True, audit: bool = False) -> int:
         title = _title(d)
         titled = {
             next(iter(direct[other.name]))
-            for other in req_split
+            for other in legacy
             if other.name != sid and _title(other) == title and title and len(direct[other.name]) == 1
         }
         if len(titled) == 1:
@@ -627,7 +1024,38 @@ def _apply_wiki(ai: Path, write: bool = True, audit: bool = False) -> int:
         if text != reg_text:
             register.write_text(text, encoding="utf-8")
             reg_text = text
+    profile_dirs = [d for d in req_split if _split_profile(d) == "4.1.0"]
+    profile_lines: dict[str, list[str]] = {}
+    profile_touched: set[str] = set()
+    planned: dict[str, list[tuple[str, str, str]]] = {}
+    want_reqs: set[str] = set()
+    digested_now = _digested(sources)
+    for d in profile_dirs:
+        binds, child_gaps = _profile_choices(ai, d, reg_text, digested_now)
+        planned[d.name] = binds
+        profile_touched.add(d.name)
+        gaps.extend(child_gaps)
+        for _atom, req, _parent in binds:
+            want_reqs.add(req)
+    if write and want_reqs:
+        backfill_live_wps(ai, want_reqs)
+        reg_text = _read(register)
+    for sid, binds in planned.items():
+        lines: list[str] = []
+        for atom, req, parent in binds:
+            wps = _live_wp_ids_for_req(ai, reg_text, req)
+            if not wps:
+                gaps.append((sid if atom == "*" else f"{sid}/{atom}", "没有工作包"))
+                continue
+            wp_s = " ".join(wps)
+            if atom == "*":
+                lines.append(f"{req} / {wp_s}".strip())
+            else:
+                lines.append(f"{atom} {req} / {wp_s} {parent}".strip())
+        if lines:
+            profile_lines[sid] = lines
     gapped = {sid for sid, _reason in gaps}
+    frozen = frozen_ids or set()
     if audit:
         for sid in sorted(reference):
             if sid not in gapped:
@@ -637,10 +1065,16 @@ def _apply_wiki(ai: Path, write: bool = True, audit: bool = False) -> int:
         digest = d / "_digest.md"
         if not digest.is_file():
             continue
+        if sid in frozen:
+            continue
         if sid in gapped:
             continue
         old = _read(digest)
-        if sid in reference:
+        if sid in profile_lines:
+            new = _set_bind(old, profile_lines[sid])
+        elif sid in profile_touched:
+            continue
+        elif sid in reference:
             new = _mark_reference(old, reference[sid])
             new = _set_bind(new, ["非需求类"])
         elif sid in chosen:
@@ -684,6 +1118,7 @@ def compile_workspace(root: str, dry_run: bool = False, check_only: bool = False
     wrote = 0
     skipped = 0
     seen: set[str] = set()
+    frozen_ids: set[str] = set()
     for sid, rec in st.get("sources", {}).items():
         path = rec.get("path") or ""
         src_dir = ai / Path(path).parent if path else sources / sid
@@ -693,6 +1128,11 @@ def compile_workspace(root: str, dry_run: bool = False, check_only: bool = False
         if key in seen:
             continue
         seen.add(key)
+        if _digest_frozen(src_dir):
+            print(f"keep {src_dir.name}")
+            skipped += 1
+            frozen_ids.add(src_dir.name)
+            continue
         status = rec.get("status")
         if status == "ok":
             print(f"ok {src_dir.name}")
@@ -727,10 +1167,17 @@ def compile_workspace(root: str, dry_run: bool = False, check_only: bool = False
             if key in seen_fail:
                 continue
             seen_fail.add(key)
+            if src.name in frozen_ids:
+                continue
             if _has_atoms(src) or (_doc_kind(src)[0] == "reference" and _has_facts(src)):
                 print(f"FAIL still {rec.get('status')} {src.name}")
                 failed += 1
-    failed += _apply_wiki(ai, write=not dry_run and not check_only, audit=check_only)
+    failed += _apply_wiki(
+        ai,
+        write=not dry_run and not check_only,
+        audit=check_only,
+        frozen_ids=frozen_ids,
+    )
     print(f"done wrote={wrote} skip={skipped} fail={failed}")
     return 1 if failed else 0
 

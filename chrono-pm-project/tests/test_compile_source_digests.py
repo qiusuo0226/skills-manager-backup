@@ -50,12 +50,12 @@ def test_compile_old_digest():
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
         _src(root, digest="old")
+        before = (root / "ai/requirements/sources/SRC-001/_digest.md").read_text(encoding="utf-8")
         assert compile_workspace(str(root)) == 0
         rec = collect_source_digest_status(root / "ai")["sources"]["SRC-001"]
-        assert rec["status"] == "ok", rec
+        assert rec["status"] == "old_digest", rec
         text = (root / "ai/requirements/sources/SRC-001/_digest.md").read_text(encoding="utf-8")
-        assert "doc_type: source-digest" in text
-        assert "ATOM-1" in text
+        assert text == before
         assert "[[wikilink]]" not in text
 
 
