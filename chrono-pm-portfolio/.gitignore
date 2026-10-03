@@ -1,0 +1,19 @@
+# Python compiled caches
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# IDE
+.idea/
+.vscode/
+.qoder-plugin/
+.qoder/
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Distribution artifacts
+*.zip
+*.tar.gz
