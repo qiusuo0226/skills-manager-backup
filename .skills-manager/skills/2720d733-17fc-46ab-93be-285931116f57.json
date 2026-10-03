@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "skill_id": "2720d733-17fc-46ab-93be-285931116f57",
+  "path": "codeplan-multireview",
+  "path_key": "codeplan-multireview",
+  "enabled": true,
+  "tags": [],
+  "source": {
+    "type": "git",
+    "ref": "https://gitee.com/qiusuo0226/codeplan-multireview",
+    "subpath": null,
+    "branch": null
+  }
+}
