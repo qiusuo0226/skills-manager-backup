@@ -1,0 +1,17 @@
+{
+  "name": "chainlinker-fe-sync-dev-to-prod",
+  "displayName": "全链通PC测试分支同步预发布分支",
+  "version": "0.1.0",
+  "schemaVersion": "0.1.0",
+  "description": "只服务 chainLinker-fe 前端：把 development 的新提交同步到 preRelease 并推远程，工作区始终留在 development。同步时检查两边业务代码完全一致；preRelease 的 VUE_APP_REDIRECT_LOGIN 必须为 true，否则改为 true。以后可增加同步规则。触发：新提交了代码、提交了代码、同步预发布、把 development 同步到 preRelease、/chainlinker-fe-sync-dev-to-prod。不要用于其他仓库。",
+  "license": "MIT",
+  "entry": "SKILL.md",
+  "referencesDir": "references",
+  "versionHistory": [
+    {
+      "version": "0.1.0",
+      "date": "2026-09-22",
+      "summary": "初始化开发仓。"
+    }
+  ]
+}
